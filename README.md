@@ -16,7 +16,15 @@ Radxa ZERO 3W + 飞特 HD1910M ×15 + BNO08x。包含当前 Luwu 四模型适配
 
 [实物 IMU/电源接线](docs/images/04_photo_imu_power.png) · [实物舵机/摄像头接线](docs/images/05_photo_usb_servo_camera.png)
 
-原 `exec-baff1ccd-ea24-47f1-a2a6-6d1fc63a12fa.png` 初稿存在端子连线错误，已用上面的校正版替代。电源并联供给各舵机，不是 15 台电源串联；接线以实物丝印为准。
+电源并联供给各舵机，不是 15 台电源串联；接线以实物丝印为准。
+
+**原始接线图（原文件保留）：此初稿存在端子连线错误，不可按其连线接电；实际接线以本节上方校正版和表格为准。**
+
+![原始接线初稿，存在端子连线错误](docs/images/exec-baff1ccd-ea24-47f1-a2a6-6d1fc63a12fa.png)
+
+**实物连接原图：**
+
+![实物连接原图](docs/images/已检查的图像.png)
 
 ## 2. 舵机编号
 
@@ -49,8 +57,15 @@ App“使能”→平滑进入 HOME→静止保持；随后再选择行走/任�
 
 ## 5. 演示与 APK
 
-[![App 演示](docs/images/app_final.png)](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/app_preview.mp4)
-[![MuJoCo 演示](docs/images/mujoco_00210.jpg)](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/mujoco_preview.mp4)
+以下 GIF 可在 README 中直接播放，覆盖完整 180 秒视频，以 **5 倍速、约 36 秒**循环预览；点击动图观看正常速度的完整 MP4。
+
+**App 操作与状态可视化**
+
+[![App 动态演示，5倍速](docs/images/app_preview.gif)](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/app_preview.mp4)
+
+**MuJoCo 运动与关节状态**
+
+[![MuJoCo 动态演示，5倍速](docs/images/mujoco_preview.gif)](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/mujoco_preview.mp4)
 
 [下载 APK](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/microduck.apk) · [App 视频](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/app_preview.mp4) · [MuJoCo 视频](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/mujoco_preview.mp4)
 

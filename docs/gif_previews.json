@@ -1,0 +1,44 @@
+{
+  "app_preview": {
+    "source_sha256": "9732a597cc0804089e4e4cfbcdf8afdedcee639b6410158c1042408e2ff11702",
+    "gif_sha256": "e0e5f9926eca484ddb64c8d85e7d6d6d5e867ef4f12b573b9801b6f82606e6ef",
+    "bytes": 9785809,
+    "speed": 5,
+    "fps": 8,
+    "full_source_timeline": true,
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 720,
+          "height": 405,
+          "nb_read_frames": "288"
+        }
+      ],
+      "format": {
+        "duration": "36.010000"
+      }
+    }
+  },
+  "mujoco_preview": {
+    "source_sha256": "cd8aef502dd99f73627ef6800374361aaab4886e6f3913c2f026c31cbcdd0478",
+    "gif_sha256": "29c16b2a8a1194543b5241bba47dfd43b8f10d9997156f162149eb3962165bbe",
+    "bytes": 9693124,
+    "speed": 5,
+    "fps": 8,
+    "full_source_timeline": true,
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 720,
+          "height": 405,
+          "nb_read_frames": "288"
+        }
+      ],
+      "format": {
+        "duration": "36.010000"
+      }
+    }
+  }
+}
