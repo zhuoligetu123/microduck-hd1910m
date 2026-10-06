@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-from run_luwu_p6_training import run_training, save
+from run_reference_p6_training import run_training, save
 from run_m6_transfer_campaign import screen
 
 

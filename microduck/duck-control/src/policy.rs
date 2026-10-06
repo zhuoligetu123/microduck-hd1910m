@@ -227,7 +227,7 @@ pub struct PolicyPaths {
 /// release, so a missing or corrupt file is a broken bundle, and the right outcome is
 /// "unhealthy, roll it back", not a robot that silently lost its kick.
 pub struct Policy {
-    luwu_homes: Option<Vec<[f64; crate::model::NUM_JOINTS]>>,
+    reference_homes: Option<Vec<[f64; crate::model::NUM_JOINTS]>>,
     hd_reference: bool,
     coherent_joint_snapshot: bool,
     coherent_skill_snapshots: Vec<bool>,
@@ -293,7 +293,7 @@ impl Policy {
     }
 
     /// Finite, operator-supported hardware experiment, not production qualification.
-    /// The caller must verify installation and configure the Luwu P6/D20 profile.
+    /// The caller must verify installation and configure the Reference P6/D20 profile.
     pub fn load_supported_m6(paths: &PolicyPaths, standing_threshold: f64) -> Result<Self, PolicyError> {
         Self::load_context(paths, standing_threshold, false, true)
     }
@@ -317,7 +317,7 @@ impl Policy {
                 hd_task_contract(&task, &metadata.custom("hardware_profile").unwrap_or_default(), simulation, supported_m6)?;
                 if task == XGO_BAM_TASK || task == XGO_BAM_P6_TASK || (supported_m6 && task == XGO_BAM_STEP_TASK) {
                     for (key, expected) in [
-                        ("actuator_backend", "xgoduck_bam_m6"),
+                        ("actuator_backend", "hd1910_bam_m6"),
                         ("action_semantics", "bounded_slew_home_delta_v2"),
                         ("previous_action_semantics", "bounded_slew_home_delta_v2"),
                         ("deployment_ready", "false"),
@@ -410,7 +410,7 @@ impl Policy {
                 skills.push(skill);
             }
             Ok(Self {
-                luwu_homes: None,
+                reference_homes: None,
                 hd_reference,
                 coherent_joint_snapshot,
                 coherent_skill_snapshots,
@@ -429,10 +429,10 @@ impl Policy {
         self.hd_reference
     }
 
-    pub fn is_luwu(&self) -> bool { self.luwu_homes.is_some() }
+    pub fn is_reference(&self) -> bool { self.reference_homes.is_some() }
 
     pub fn home(&self, net: Net) -> [f64; crate::model::NUM_JOINTS] {
-        match &self.luwu_homes {
+        match &self.reference_homes {
             None => crate::model::DEFAULT_POSITION,
             Some(homes) => homes[match net {
                 Net::GroundPick => 1,
@@ -444,12 +444,12 @@ impl Policy {
 
     /// Pinned published graphs, with their own HOME/raw-action contract. Never load
     /// them through the bounded-slew HD profile or substitute a missing skill.
-    pub fn load_luwu(paths: &PolicyPaths) -> Result<Self, PolicyError> {
+    pub fn load_reference(paths: &PolicyPaths) -> Result<Self, PolicyError> {
         use sha2::{Digest, Sha256};
         if paths.stand.is_some() || paths.sitstand.is_some() || paths.skills.len() != 2 {
-            return Err(PolicyError::Inference("Luwu requires walk, pick, recovery, roulade; no stand/sitstand graph".into()));
+            return Err(PolicyError::Inference("Reference requires walk, pick, recovery, roulade; no stand/sitstand graph".into()));
         }
-        let pick = paths.ground_pick.as_ref().ok_or_else(|| PolicyError::Inference("Luwu pick missing".into()))?;
+        let pick = paths.ground_pick.as_ref().ok_or_else(|| PolicyError::Inference("Reference pick missing".into()))?;
         ensure_runtime()?;
         catching_ort_panics(|| {
             let files = [&paths.walk, pick, &paths.skills[0], &paths.skills[1]];
@@ -467,17 +467,17 @@ impl Policy {
                 let bytes = std::fs::read(path).map_err(|e| PolicyError::Inference(e.to_string()))?;
                 let digest = Sha256::digest(&bytes).iter().map(|b| format!("{b:02x}")).collect::<String>();
                 if digest != hash {
-                    return Err(PolicyError::Inference(format!("Luwu role/hash mismatch: {}", path.display())));
+                    return Err(PolicyError::Inference(format!("Reference role/hash mismatch: {}", path.display())));
                 }
                 let mut session = open(path)?;
                 let meta = session.metadata().map_err(|e| PolicyError::Inference(e.to_string()))?;
                 if meta.custom("joint_names").as_deref() != Some(names.as_str()) {
-                    return Err(PolicyError::Inference("Luwu joint order mismatch".into()));
+                    return Err(PolicyError::Inference("Reference joint order mismatch".into()));
                 }
                 let q = meta.custom("default_joint_pos").unwrap_or_default().split(',')
                     .map(str::parse::<f32>).collect::<Result<Vec<_>, _>>()
                     .map_err(|e| PolicyError::Inference(e.to_string()))?;
-                let q: [f32; ACTION_LEN] = q.try_into().map_err(|_| PolicyError::Inference("Luwu HOME width".into()))?;
+                let q: [f32; ACTION_LEN] = q.try_into().map_err(|_| PolicyError::Inference("Reference HOME width".into()))?;
                 if q.iter().any(|v| !v.is_finite()) { return Err(PolicyError::Inference("nonfinite HOME".into())); }
                 homes.push(Observation::scatter_action(&q));
                 drop(meta);
@@ -487,7 +487,7 @@ impl Policy {
             let walk = sessions.remove(0);
             let ground_pick = Some(sessions.remove(0));
             Ok(Self {
-                luwu_homes: Some(homes), hd_reference: false,
+                reference_homes: Some(homes), hd_reference: false,
                 coherent_joint_snapshot: true, coherent_skill_snapshots: vec![true; 2],
                 walk, ground_pick, stand: None, sitstand: None, skills: sessions,
                 standing_threshold: DEFAULT_STANDING_THRESHOLD, standing_disabled: true,

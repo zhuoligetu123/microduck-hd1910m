@@ -40,18 +40,20 @@ def main():
         'rust_tests': {'duck_control':128, 'robotd':145, 'robotd_integration':7,
                        'robotd_params':87, 'backend':7, 'ignored_external_model_tests':3},
         'python_contract_tests': 12, 'release_config_tests': 3,
+        'four_graph_hash_contract_and_scheduler': 'passed with real ONNX graphs and native ORT',
         'native_sim_protocol': {key: sim[key] for key in (
             'physical_hardware', 'physics', 'gait_qualified', 'enable_home_without_rl',
             'stop_holds_enabled', 'skills', 'walk_command', 'mouth_target')},
         'release_launcher': 'passed, isolated simulation health online; no physical I/O',
-        'apk': {'package':'com.microduck.control', 'version':'0.1.1', 'version_code':2,
+        'apk': {'package':'com.microduck.control', 'version':'0.1.2', 'version_code':3,
                 'signature':'APK v2 verified; internal debug-signed build',
                 'source_uploaded':False},
         'urdf': {'sha256':digest(urdf), 'visual_mesh_references':len(meshes), 'all_resolve':True},
         'assets':assets,
         'limits': ['No new physical robot test', 'No new long training run',
                    'Native protocol simulation uses fixed base support, not a gait qualification',
-                   'Historical free-body video includes skill failures; see video_validation.json']}
+                   'Front recovery and dynamic roll landing passed one free-body recording; see skill_validation.json',
+                   'Other initial conditions still fail; no general recovery guarantee']}
     (ROOT / 'docs/release_validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
     print(json.dumps({'assets':len(assets), 'urdf_meshes':len(meshes), 'physical_hardware':False}))
 

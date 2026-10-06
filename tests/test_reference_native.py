@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Luwu App/Rust/ONNX/MuJoCo protocol test. Never connects to hardware."""
+"""Reference App/Rust/ONNX/MuJoCo protocol test. Never connects to hardware."""
 import asyncio
 import hashlib
 import json
@@ -32,7 +32,7 @@ async def exercise():
     async with ws:
         def frame(s):
             return s.get('data', {})
-        ready = await until(ws, lambda s: s.get('online') and frame(s).get('feedback', {}).get('luwu_native'), seconds=20)
+        ready = await until(ws, lambda s: s.get('online') and frame(s).get('feedback', {}).get('reference_native'), seconds=20)
         assert set(ready['skills']) == {'stand', 'walk', 'ground_pick', 'recovery', 'roulade'}, ready
         assert not frame(ready)['feedback']['policy_enabled']
         async def send(i, **cmd):
@@ -77,18 +77,18 @@ async def exercise():
 def main():
     REPORT.mkdir(parents=True, exist_ok=True)
     processes, logs = [], []
-    with tempfile.TemporaryDirectory(prefix='luwu-native-') as folder:
+    with tempfile.TemporaryDirectory(prefix='reference-native-') as folder:
         bundle = Path(folder)
         base = ROOT / 'sim'
         for name in ['hd1910.mjb', 'motor_calibration.json']:
             shutil.copy2(base / name, bundle / name)
-        walk = ROOT / 'radxa/references/luwu_runtime_20261005/xgoduck_walk.onnx'
+        walk = ROOT / 'radxa/references/reference_runtime_20261005/hd1910_walk.onnx'
         shutil.copy2(walk, bundle / 'policy.onnx')
         physics = json.loads((base / 'physics.json').read_text())
         physics['policy_sha256'] = hashlib.sha256(walk.read_bytes()).hexdigest()
         (bundle / 'physics.json').write_text(json.dumps(physics))
-        config = (ROOT / 'radxa/luwu_native.toml').read_text().replace('/home/robot/workspace/huggingface', str(ROOT))
-        config = config.replace(f'feetech:{ROOT}/radxa/luwu_native.json', 'sim:127.0.0.1:17803')
+        config = (ROOT / 'radxa/reference_native.toml').read_text().replace('/home/robot/workspace/huggingface', str(ROOT))
+        config = config.replace(f'feetech:{ROOT}/radxa/reference_native.json', 'sim:127.0.0.1:17803')
         config = config.replace(str(walk), str(bundle / 'policy.onnx'))
         (bundle / 'params.toml').write_text(config)
         env = dict(os.environ, PYTHONPATH=str(ROOT/'microduck_rl/src'),
@@ -97,8 +97,8 @@ def main():
         env.pop('MICRODUCK_APP_TOKEN', None)
         commands = [
             [sys.executable, '-m', 'mjlab_microduck.sim.hd1910_body', '--bundle', str(bundle), '--port', '17803', '--supported-start'],
-            [str(ROOT/'microduck/target/debug/robotd'), '--params', str(bundle/'params.toml'), '--socket', str(bundle/'robotd.sock')],
-            [str(APP/'backend/target/debug/microduck-app-server')]]
+            [str(ROOT/'out/native/bin/robotd'), '--params', str(bundle/'params.toml'), '--socket', str(bundle/'robotd.sock')],
+            [str(ROOT/'out/native/bin/microduck-app-server')]]
         try:
             for name, cmd in zip(['body','robotd','app'], commands):
                 log = (REPORT/f'{name}.log').open('w'); logs.append(log)

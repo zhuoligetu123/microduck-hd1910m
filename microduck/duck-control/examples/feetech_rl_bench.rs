@@ -642,7 +642,7 @@ fn main() -> Result<()> {
         let cfg: duck_control::feetech::Config = serde_json::from_slice(&std::fs::read(&args[1])?)?;
         if !cfg.allow_motion || cfg.servo_gain_profile.is_none() {
             return Err(
-                "M6 supported trial requires explicit motion and Luwu P6/D20 profile".into(),
+                "M6 supported trial requires explicit motion and Reference P6/D20 profile".into(),
             );
         }
     }

@@ -18,7 +18,7 @@ fn err(e: impl std::fmt::Display) -> IoError {
 
 #[derive(Default)]
 struct Reports {
-    luwu_filter: bool,
+    reference_filter: bool,
     gyro: Option<([f64; 3], u8, Instant)>,
     quat: Option<([f64; 4], u8, Instant)>,
     gyro_count: u64,
@@ -73,7 +73,7 @@ impl Reports {
             match bytes[0] {
                 2 if bytes[2] & 3 != 0 && fresh(self.gyro.map(|v| v.1), bytes[1]) => {
                     let mut g = [word(4) / 512., word(6) / 512., word(8) / 512.];
-                    if self.luwu_filter && let Some((old, _, at)) = self.gyro {
+                    if self.reference_filter && let Some((old, _, at)) = self.gyro {
                         let weight = 0.5f64.powf(now.duration_since(at).as_secs_f64() / 0.01);
                         for i in 0..3 { g[i] = weight * old[i] + (1.0-weight) * g[i]; }
                     }
@@ -120,9 +120,9 @@ impl Reports {
 }
 
 #[test]
-fn luwu_gyro_ema_is_applied_once_per_fresh_report() {
+fn reference_gyro_ema_is_applied_once_per_fresh_report() {
     let now=Instant::now();
-    let mut reports=Reports {luwu_filter:true,..Default::default()};
+    let mut reports=Reports {reference_filter:true,..Default::default()};
     let mut packet=[2,1,3,0,0,2,0,0,0,0];
     reports.parse(&packet,now).unwrap();
     assert_eq!(reports.gyro.unwrap().0,[1.,0.,0.]);
@@ -145,8 +145,8 @@ pub struct Bno08x {
 }
 
 impl Bno08x {
-    pub fn set_luwu_filter(&self, enabled: bool) {
-        self.state.lock().unwrap().0.luwu_filter = enabled;
+    pub fn set_reference_filter(&self, enabled: bool) {
+        self.state.lock().unwrap().0.reference_filter = enabled;
     }
     #[cfg(test)]
     pub(crate) fn fixture_unavailable() -> Self {

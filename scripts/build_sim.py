@@ -14,9 +14,9 @@ sys.path.insert(0, str(ROOT / 'radxa'))
 def main():
     import mujoco
     import mjlab
-    from luwu_policy import LuwuPolicy
-    from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
-    from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH
+    from reference_policy import ReferencePolicy
+    from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
+    from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH
     dest = ROOT / 'sim'
     dest.mkdir(exist_ok=True)
     cfg = make_xgo_bam_env_cfg(play=True, repair_variant='recovery')
@@ -41,7 +41,7 @@ def main():
     model.vis.headlight.ambient[:] = .4
     model.vis.headlight.diffuse[:] = .6
     mujoco.mj_saveModel(model, str(dest / 'hd1910.mjb'))
-    policy = LuwuPolicy('walk')
+    policy = ReferencePolicy('walk')
     shutil.copy2(policy.path, dest / 'policy.onnx')
     shutil.copy2(PROFILE_PATH, dest / 'motor_calibration.json')
     (dest / 'home.json').write_text(json.dumps(policy.home.tolist()))
@@ -50,7 +50,7 @@ def main():
     meta = dict(bundle_schema=2, profile_file='motor_calibration.json', policy_file='policy.onnx',
                 policy_sha256=digest('policy.onnx'), sha256=digest('hd1910.mjb'),
                 profile_sha256=digest('motor_calibration.json'), mujoco=mujoco.__version__,
-                physics_hz=200, delay_steps=4, voltage=7.4, kp_fw=6., actuator_backend='xgoduck_bam_m6',
+                physics_hz=200, delay_steps=4, voltage=7.4, kp_fw=6., actuator_backend='hd1910_bam_m6',
                 calibrated=False, hardware_tested=False)
     (dest / 'physics.json').write_text(json.dumps(meta, indent=2) + '\n')
     print(dest)

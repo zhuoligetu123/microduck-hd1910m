@@ -1,0 +1,32 @@
+{
+  "file": "/home/robot/视频/microduck/MicroDuck_HD1910M_科技详解_动作验证版_1080p.mp4",
+  "duration_seconds": 403.968,
+  "size_bytes": 154356651,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "fps": "30/1",
+  "video_codec": "h264",
+  "audio_codec": "aac",
+  "audio_rate_hz": 48000,
+  "subtitle_count": 71,
+  "chapter_count": 27,
+  "full_decode_passed": true,
+  "black_intervals": [],
+  "subtitle_timing_and_width_passed": true,
+  "sampled_chapters": 27,
+  "sampled_transitions": 26,
+  "source": "User supplied real footage plus original locomotion and newly recorded App/native MuJoCo skills; no robot operation",
+  "highlight_chapter_s": 8,
+  "highlight_source_8qt_s": [
+    0,
+    6
+  ],
+  "camera_seconds": 60,
+  "camera_clip_count": 6,
+  "removed_v1_03m25_scene": true,
+  "arabic_pin_subtitles_checked": true,
+  "narration": "Synthetic Chinese narration, zh-CN-YunxiNeural",
+  "visual_manual_review": "Inspect qa PNGs and contact sheet separately"
+}

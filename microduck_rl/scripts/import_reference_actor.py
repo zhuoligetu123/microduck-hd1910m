@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Initialize the local bounded actor from Luwu's raw ONNX; no hardware access.
+"""Initialize the local bounded actor from Reference's raw ONNX; no hardware access.
 
 This is weight transfer, not PPO resume: upstream critic/optimizer and sample
 count are not in ONNX. Applied-action history differs from upstream raw history
@@ -75,7 +75,7 @@ def transfer(source, template_policy, template_checkpoint, output):
     checkpoint['iter'] = 0
     checkpoint['infos'] = None
     digest = hashlib.sha256(Path(source).read_bytes()).hexdigest()
-    target_meta.update(training_recipe='luwu_actor_initialization_v1', source_actor_sha256=digest,
+    target_meta.update(training_recipe='reference_actor_initialization_v1', source_actor_sha256=digest,
         initialization_only='true', hardware_tested='false', deployment_ready='false')
     onnx.helper.set_model_props(local, target_meta)
     onnx.checker.check_model(local)

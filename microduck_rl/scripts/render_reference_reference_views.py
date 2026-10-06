@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'radxa'))
-from luwu_policy import JOINTS, LocalCalibration, LuwuPolicy
+from reference_policy import JOINTS, LocalCalibration, ReferencePolicy
 from replay_hd1910 import load_replay_model
 
 
@@ -33,7 +33,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    policy = LuwuPolicy('walk')
+    policy = ReferencePolicy('walk')
     calibration = LocalCalibration()
     model, data, motor = load_replay_model(7.4, bam_reference=True, repair_variant='recovery')
     assert list(JOINTS) == [model.joint(int(j)).name for j in motor.joint_ids]

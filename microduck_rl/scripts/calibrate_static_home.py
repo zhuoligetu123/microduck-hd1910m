@@ -39,7 +39,7 @@ def extract_reference(path):
             joints, motors = f['joints'], f['states']
             if (state['policy'] != 'held' or f['policy_enabled'] or not f['homed']
                     or not f['control_valid'] or not f['imu_valid'] or f['error']
-                    or not f['servo_gains_verified'] or f['servo_gain_profile'] != 'luwu_runtime'
+                    or not f['servo_gains_verified'] or f['servo_gain_profile'] != 'reference_runtime'
                     or not 0 <= f['joint_age_s'] < .1 or not 0 <= f['imu_age_s'] < .05):
                 raise ValueError('capture must contain fresh, alarm-free, homed HOLD only')
             if ([j['name'] for j in joints] != list(JOINTS)
@@ -108,7 +108,7 @@ def simulate(reference, policy_path, output):
     import mujoco
     from replay_hd1910 import ReplayPolicy, load_replay_model, validate_metadata
     from mjlab_microduck.robot.microduck_constants import HOME_FRAME
-    from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH, KP_FW
+    from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH, KP_FW
 
     measured_v = reference['frame_median_voltage_v']['p50']
     if not 6 <= measured_v <= 8:
@@ -128,7 +128,7 @@ def simulate(reference, policy_path, output):
     for voltage in sorted({7.4, measured_v}):
         model, data, motor = load_replay_model(voltage, bam_reference=True,
             voltage_extrapolation=voltage < 7., ground_contact=True,
-            repair_variant='gait_luwu_curriculum_scaled_v21')
+            repair_variant='gait_reference_curriculum_scaled_v21')
         if [model.joint(int(j)).name for j in motor.joint_ids] != names:
             raise ValueError('simulator joint order mismatch')
         policy = ReplayPolicy(model, data, walking_onnx_path=str(policy_path),

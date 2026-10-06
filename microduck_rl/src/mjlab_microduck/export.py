@@ -287,7 +287,7 @@ def run_export(task_id: str, cfg: ExportConfig) -> ExportResult:
             metadata['head_sway_yaw_amplitude_rad'] = str(env_cfg.rewards['sway_head_yaw'].params['amplitude'])
             metadata['head_sway_reference'] = 'camera_forward_in_trunk_frame'
     attach_metadata_to_onnx(onnx_path, metadata)
-    from mjlab_microduck.tasks.xgoduck_bam import restore_joint_snapshot_metadata
+    from mjlab_microduck.tasks.hd1910_bam import restore_joint_snapshot_metadata
     restore_joint_snapshot_metadata(onnx_path)
 
     print(f"Written {onnx_path}")

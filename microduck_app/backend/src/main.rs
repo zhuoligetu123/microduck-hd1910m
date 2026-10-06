@@ -39,25 +39,25 @@ fn valid(cmd: &Value) -> bool {
 }
 
 fn motion_limits(state: &Value) -> Value {
-    // Published Luwu weights need a larger command range than the legacy gait.
-    let luwu = state.pointer("/data/feedback/luwu_native") == Some(&json!(true));
-    json!({"vx":if luwu {0.30} else {0.15}, "vy":0.04,
-           "vyaw":if luwu {0.8} else {0.5}})
+    // Published Reference weights need a larger command range than the legacy gait.
+    let reference = state.pointer("/data/feedback/reference_native") == Some(&json!(true));
+    json!({"vx":if reference {0.30} else {0.15}, "vy":0.04,
+           "vyaw":if reference {0.8} else {0.5}})
 }
 
 #[test]
-fn luwu_command_range_matches_advertisement_without_expanding_legacy() {
-    let luwu = json!({"data":{"feedback":{"luwu_native":true}}});
+fn reference_command_range_matches_advertisement_without_expanding_legacy() {
+    let reference = json!({"data":{"feedback":{"reference_native":true}}});
     let legacy = json!({});
     for (vx,wz) in [(0.3,0.0),(-0.3,0.0),(0.0,0.8),(0.0,-0.8)] {
         let cmd = json!({"type":"move","vx":vx,"vy":0,"vyaw":wz});
-        assert!(valid_for_state(&cmd,&luwu));
+        assert!(valid_for_state(&cmd,&reference));
         assert!(!valid_for_state(&cmd,&legacy));
     }
     for vx in [-0.301,0.301] {
-        assert!(!valid_for_state(&json!({"type":"move","vx":vx,"vy":0,"vyaw":0}),&luwu));
+        assert!(!valid_for_state(&json!({"type":"move","vx":vx,"vy":0,"vyaw":0}),&reference));
     }
-    assert!(valid_for_state(&json!({"type":"stop"}),&luwu));
+    assert!(valid_for_state(&json!({"type":"stop"}),&reference));
     assert!(valid_for_state(&json!({"type":"move","vx":0,"vy":0,"vyaw":0}),&legacy));
 }
 
@@ -324,7 +324,7 @@ async fn robotd_source(app: App, mut commands: mpsc::Receiver<Value>, path: Path
                                         "skills":skills,"motion_available":motion,"head_control_available":motion
                                             && !matches!(payload["policy"].as_str(), Some("step" | "recovery" | "ground_pick" | "roulade")),
                                         "motion_error":fault,
-                                        "experimental_skills":if payload.pointer("/feedback/luwu_native") == Some(&json!(true)) {
+                                        "experimental_skills":if payload.pointer("/feedback/reference_native") == Some(&json!(true)) {
                                             json!(["recovery","ground_pick","roulade"])
                                         } else if payload.pointer("/feedback/supported_m6") == Some(&json!(true)) { json!(["step"]) } else {json!([])},
                                         "policy_unavailable":policy_unavailable}));

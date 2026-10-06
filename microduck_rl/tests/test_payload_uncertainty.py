@@ -7,7 +7,7 @@ import pytest
 from mjlab_microduck.actuator.payload_uncertainty import (
     PROFILE, SCENARIOS, apply_mass_scenario, mass_contract)
 from mjlab_microduck.actuator.reference_hd1910 import make_hd1910_spec
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 
 
 def test_inventory_not_added_again():

@@ -16,7 +16,7 @@ import torch
 from mjlab.envs import ManagerBasedRlEnv
 from mjlab.sensor import ContactMatch, ContactSensorCfg
 from mjlab.terrains.terrain_generator import TerrainGenerator
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg, configure_terrain_course
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg, configure_terrain_course
 from replay_hd1910 import replay_cases, validate_metadata
 from replay_hd1910_warp import make_replay_cfg, policy_recipe
 

@@ -200,7 +200,7 @@ class ReplayPolicy(PolicyInference):
         return previous
 
 
-class LuwuReplayPolicy(ReplayPolicy):
+class ReferenceReplayPolicy(ReplayPolicy):
     """Simulation-only upstream contract: raw history, optional runtime EMA."""
 
     def reset_joint_observation_history(self):
@@ -214,7 +214,7 @@ class LuwuReplayPolicy(ReplayPolicy):
         return self.filtered_action.copy()
 
 
-def luwu_policy_pose(metadata, joint_names):
+def reference_policy_pose(metadata, joint_names):
     expected_obs = 'base_ang_vel,projected_gravity,joint_pos,joint_vel,actions,command,head_command,body_command'
     if (metadata.get('joint_names') != ','.join(joint_names)
             or metadata.get('observation_names') != expected_obs
@@ -249,8 +249,8 @@ def load_replay_model(voltage, posture=False, bam_reference=False, voltage_extra
     if bam_reference:
         if posture:
             raise ValueError('M6 reference currently supports velocity only')
-        from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
-        from mjlab_microduck.actuator.cpu_xgoduck_bam import XgoBamCpuController
+        from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
+        from mjlab_microduck.actuator.cpu_hd1910_bam import XgoBamCpuController
         cfg = make_xgo_bam_env_cfg(play=True, repair_variant=repair_variant)
         if ground_contact:
             from functools import partial
@@ -306,10 +306,10 @@ def step_control_period(model,data,motor, observation_policy=None):
 def validate_metadata(metadata,joint_names,*,posture=False,bam_reference=False,roulade=False,step=False):
     profile_path = PROFILE_PATH
     if bam_reference:
-        from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH as profile_path, TASK_ID, KP_FW
-        from mjlab_microduck.tasks.xgoduck_bam import SITSTAND_TASK_ID, ROULADE_TASK_ID, STEP_TASK_ID
+        from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH as profile_path, TASK_ID, KP_FW
+        from mjlab_microduck.tasks.hd1910_bam import SITSTAND_TASK_ID, ROULADE_TASK_ID, STEP_TASK_ID
         expected_task = STEP_TASK_ID if step else ROULADE_TASK_ID if roulade else SITSTAND_TASK_ID if posture else TASK_ID
-        if metadata.get('actuator_backend') != 'xgoduck_bam_m6' or metadata.get('task_id') != expected_task:
+        if metadata.get('actuator_backend') != 'hd1910_bam_m6' or metadata.get('task_id') != expected_task:
             raise ValueError('M6 replay requires its own explicitly tagged policy')
     digest=hashlib.sha256(profile_path.read_bytes()).hexdigest()
     expected={
@@ -422,19 +422,19 @@ def replay(args):
     if delay not in range(3,11) or not math.isfinite(tilt_range) or not 0 <= tilt_range <= 10:
         raise ValueError('stress replay requires delay 3..10 and initial tilt 0..10 degrees')
     motor.delay = delay
-    external_luwu = getattr(args, 'luwu_policy', False)
-    if external_luwu and not bam_reference:
-        raise ValueError('--luwu-policy requires --bam-reference; simulation only')
-    policy_class = LuwuReplayPolicy if external_luwu else ReplayPolicy
+    external_reference = getattr(args, 'reference_policy', False)
+    if external_reference and not bam_reference:
+        raise ValueError('--reference-policy requires --bam-reference; simulation only')
+    policy_class = ReferenceReplayPolicy if external_reference else ReplayPolicy
     policy=policy_class(model,data,walking_onnx_path=str(args.policy),bam_ctrl=motor,
                         new_cmd_obs=True,use_projected_gravity=True)
     if getattr(args, 'action_diagnostics', False):
         from action_request_probe import ActionRequestProbe
         policy.ort_session = ActionRequestProbe(policy.ort_session, args.policy)
-    if external_luwu:
-        policy.action_alpha = getattr(args, 'luwu_action_alpha', .45)
+    if external_reference:
+        policy.action_alpha = getattr(args, 'reference_action_alpha', .45)
         if not math.isfinite(policy.action_alpha) or not 0 <= policy.action_alpha < 1:
-            raise ValueError('invalid Luwu EMA coefficient')
+            raise ValueError('invalid Reference EMA coefficient')
     joint_age_steps = getattr(args, 'joint_age_steps', 0)
     age_capture = getattr(args, 'joint_age_capture', None)
     if age_capture and joint_age_steps:
@@ -484,10 +484,10 @@ def replay(args):
         mesh = model.geom_dataid[gid]
         start = model.mesh_vertadr[mesh]
         feet.append((gid, model.mesh_vert[start:start+model.mesh_vertnum[mesh]]))
-    if external_luwu:
-        policy.default_pose = luwu_policy_pose(metadata, joint_names)
+    if external_reference:
+        policy.default_pose = reference_policy_pose(metadata, joint_names)
         policy.coherent_joint_snapshot = True
-        from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH as replay_profile
+        from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH as replay_profile
         digest = hashlib.sha256(replay_profile.read_bytes()).hexdigest()
     else:
         digest=validate_metadata(metadata,joint_names,bam_reference=bam_reference)
@@ -594,7 +594,7 @@ def replay(args):
                     hold_left -= 1
                     held_targets += 1
                     target = previous.copy()
-                    if not external_luwu:
+                    if not external_reference:
                         policy.last_action = ((target-policy.default_pose)/policy.action_scale).astype(np.float32)
                 if not np.isfinite(target).all(): raise ValueError('nonfinite target')
                 target_limit_violations += int(np.any((target < joint_limits[:,0]-1e-6) | (target > joint_limits[:,1]+1e-6)))
@@ -757,15 +757,15 @@ def replay(args):
                 rows[-1]['action_request_diagnostics'] = policy.ort_session.take_metrics()
     result=dict(policy_sha256=hashlib.sha256(args.policy.read_bytes()).hexdigest(),
                 head_command_schedule_version=2,
-                external_luwu_policy=external_luwu,
-                luwu_action_alpha=policy.action_alpha if external_luwu else None,
+                external_reference_policy=external_reference,
+                reference_action_alpha=policy.action_alpha if external_reference else None,
                 home_pose_rad=policy.default_pose.tolist(),
-                previous_action_semantics='raw_home_delta' if external_luwu else metadata.get('previous_action_semantics'),
+                previous_action_semantics='raw_home_delta' if external_reference else metadata.get('previous_action_semantics'),
                 ground_contact_model=bool(getattr(args, 'ground_contact', False)),
                 profile_sha256=digest,calibration_status='external_reference_unvalidated',
                 voltage_v=args.voltage,performance_voltage_cap_v=None if bam_reference else 7.4,
                 voltage_extrapolation=bool(getattr(args, 'voltage_extrapolation', False)),
-                actuator_backend='xgoduck_bam_m6' if bam_reference else 'hd1910_reference_pd',
+                actuator_backend='hd1910_bam_m6' if bam_reference else 'hd1910_reference_pd',
                 actuator_delay_ms=delay*5,command_loss_probability=loss_probability,
                 command_hold_max_steps=hold_max,policy_hz=50,physics_hz=200,
                 joint_position_observation_delay_ms=joint_age_steps*20 if captured_ages is None else None,
@@ -804,8 +804,8 @@ def replay(args):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--policy',type=Path,required=True)
-    p.add_argument('--luwu-policy', action='store_true', help='Simulation only: upstream raw-action history and metadata HOME')
-    p.add_argument('--luwu-action-alpha', type=float, default=.45, help='Upstream old-action EMA weight; 0 tests the unfiltered training contract')
+    p.add_argument('--reference-policy', action='store_true', help='Simulation only: upstream raw-action history and metadata HOME')
+    p.add_argument('--reference-action-alpha', type=float, default=.45, help='Upstream old-action EMA weight; 0 tests the unfiltered training contract')
     p.add_argument('--bam-reference',action='store_true',help='Explicit external M6 model; rejects PD policies')
     p.add_argument('--ground-contact', action='store_true',
                    help='Use existing body/head ground-contact MJCF; report head impact separately')

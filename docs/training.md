@@ -1,8 +1,8 @@
 # 训练与验证
 
-发布默认模型是未修改的 Luwu 四个 ONNX，不是本机 PPO 续训检查点；本仓库未包含优化器、训练日志、W&B 数据或历史候选权重。ONNX 不能直接当 PPO 优化器检查点续训。
+发布默认模型是未修改的 Reference 四个 ONNX，不是本机 PPO 续训检查点；本仓库未包含优化器、训练日志、W&B 数据或历史候选权重。ONNX 不能直接当 PPO 优化器检查点续训。
 
-本机研究训练环境保留在 `microduck_rl/src/mjlab_microduck/tasks`。先验证环境和动作语义，再训练；不要把下列冒烟命令视为复现 Luwu 原权重的配方。
+本机研究训练环境保留在 `microduck_rl/src/mjlab_microduck/tasks`。先验证环境和动作语义，再训练；不要把下列冒烟命令视为复现 Reference 原权重的配方。
 
 ```bash
 cd microduck_rl
@@ -23,9 +23,9 @@ cargo build --locked -p robotd
 cd ../microduck_app/backend
 cargo build --locked
 cd ../..
-PYTHONPATH=radxa microduck_rl/.venv/bin/python -m unittest discover -s radxa -p test_luwu_policy.py
+PYTHONPATH=radxa microduck_rl/.venv/bin/python -m unittest discover -s radxa -p test_reference_policy.py
 microduck_rl/.venv/bin/python scripts/build_sim.py
-microduck_rl/.venv/bin/python tests/test_luwu_native.py
+microduck_rl/.venv/bin/python tests/test_reference_native.py
 ```
 
 最后一项使用固定基座 MuJoCo 验证 HOME、嘴、行走指令、停止与技能切换，不代表自由站立或实机步态通过。自由仿真用 `scripts/run_sim.py --viewer`，不要加 `--supported`。

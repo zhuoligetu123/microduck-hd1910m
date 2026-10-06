@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unmodified upstream ONNX on upstream XgoDuck geometry. Simulation only.
+"""Unmodified reference ONNX on reference geometry. Simulation only.
 
 50 Hz inference / 200 Hz CPU MuJoCo, official BAM M6 equations. No local
 bounded-action wrapper, target slew, reward changes, or hardware connection.
@@ -24,7 +24,7 @@ import mjlab
 from bam.mjlab import BamActuatorCfg
 from mjlab.entity import EntityCfg, EntityArticulationInfoCfg
 from mjlab.sim.sim import MujocoCfg
-from mjlab_microduck.actuator.cpu_xgoduck_bam import XgoBamCpuController
+from mjlab_microduck.actuator.cpu_hd1910_bam import XgoBamCpuController
 
 
 PROFILES = {
@@ -107,7 +107,7 @@ def source_spec(robot):
 
 
 def make_model(source, kp, voltage, delay):
-    robot = source/'src/mjlab_microduck/robot/xgoduck'
+    robot = source/'src/mjlab_microduck/robot/hd1910'
     # Use BAM's actual edit_spec: the XML's viewer-only position actuators
     # must become torque motors before writing BAM-computed torques to ctrl.
     cfg = EntityCfg(spec_fn=partial(source_spec, robot),
@@ -244,7 +244,7 @@ def run_case(args, session, profile, scenario, seed, writer=None):
                     frame = Image.fromarray(renderer.render())
                     draw = ImageDraw.Draw(frame, 'RGBA')
                     draw.rectangle((0, 0, 640, 88), fill=(12, 25, 35, 210))
-                    text = (f'Luwu original ONNX | {profile} | {name} | t={t:.1f}s\n'
+                    text = (f'Reference original ONNX | {profile} | {name} | t={t:.1f}s\n'
                             f'vx {cmd[0]:+.2f}/{velocity[0]:+.2f} m/s  wz {cmd[2]:+.2f}/{wz:+.2f} rad/s\n'
                             f'sole L/R {heights[0]:.1f}/{heights[1]:.1f} mm  tilt {tilt:.1f} deg\n'
                             f'head push {force:+.1f} N  | '+('FALL' if first_fall else 'SIMULATION'))
@@ -319,7 +319,7 @@ def main():
         raise ValueError('Expected 61->14 ONNX')
     if meta.get('action_scale') != '1.0' or meta.get('action_semantics', 'raw_home_delta') != 'raw_home_delta':
         raise ValueError('Not an upstream raw-action model')
-    robot = args.source/'src/mjlab_microduck/robot/xgoduck'
+    robot = args.source/'src/mjlab_microduck/robot/hd1910'
     report = dict(policy_sha256=hashlib.sha256(args.policy.read_bytes()).hexdigest(),
                   source_commit=subprocess.check_output(['git', '-C', str(args.source), 'rev-parse', 'HEAD'], text=True).strip(),
                   geometry_sha256=hashlib.sha256((robot/'robot_walk.xml').read_bytes()).hexdigest(),

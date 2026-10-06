@@ -94,7 +94,7 @@ def test_invalid_target_does_not_replace_last_target(pair):
 
 @pytest.fixture
 def bound_m6(tmp_path):
-    from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH as reference
+    from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH as reference
     model, _, _ = load_replay_model(7.4, bam_reference=True)
     path = tmp_path/'hd1910.mjb'
     mujoco.mj_saveModel(model, str(path))
@@ -108,7 +108,7 @@ def bound_m6(tmp_path):
         sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
         profile_sha256=hashlib.sha256(profile_path.read_bytes()).hexdigest(),
         profile_file='motor_calibration.json', voltage=7.4, delay_steps=4, physics_hz=200,
-        actuator_backend='xgoduck_bam_m6', policy_file='policy.onnx',
+        actuator_backend='hd1910_bam_m6', policy_file='policy.onnx',
         policy_sha256=hashlib.sha256((tmp_path/'policy.onnx').read_bytes()).hexdigest())
     (tmp_path/'physics.json').write_text(json.dumps(meta))
     (tmp_path/'params.toml').write_text('[bus]\nport="sim:127.0.0.1:17801"\n'

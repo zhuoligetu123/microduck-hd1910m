@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
-MODELS = ROOT / 'radxa/references/luwu_runtime_20261005'
+MODELS = ROOT / 'radxa/references/reference_runtime_20261005'
 
 
 def configure(output, calibration=None, port='/dev/hd1910-servo', motion=False, sim_port=None):
@@ -15,16 +15,16 @@ def configure(output, calibration=None, port='/dev/hd1910-servo', motion=False, 
     output.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((MODELS / 'manifest.json').read_text())
     for role, meta in manifest['models'].items():
-        path = MODELS / f'xgoduck_{role}.onnx'
+        path = MODELS / f'hd1910_{role}.onnx'
         if hashlib.sha256(path.read_bytes()).hexdigest() != meta['sha256']:
             raise ValueError(f'Model hash mismatch: {role}')
-    text = (ROOT / 'radxa/luwu_native.toml').read_text()
-    text = text.replace('/home/robot/workspace/huggingface/radxa/references/luwu_runtime_20261005', str(MODELS))
-    old_bus = 'feetech:/home/robot/workspace/huggingface/radxa/luwu_native.json'
+    text = (ROOT / 'radxa/reference_native.toml').read_text()
+    text = text.replace('/home/robot/workspace/huggingface/radxa/references/reference_runtime_20261005', str(MODELS))
+    old_bus = 'feetech:/home/robot/workspace/huggingface/radxa/reference_native.json'
     if sim_port is not None:
         text = text.replace(old_bus, f'sim:127.0.0.1:{sim_port}')
-        shutil.copy2(MODELS / 'xgoduck_walk.onnx', output / 'policy.onnx')
-        text = text.replace(str(MODELS / 'xgoduck_walk.onnx'), str(output / 'policy.onnx'))
+        shutil.copy2(MODELS / 'hd1910_walk.onnx', output / 'policy.onnx')
+        text = text.replace(str(MODELS / 'hd1910_walk.onnx'), str(output / 'policy.onnx'))
     else:
         calibration = (calibration or ROOT / 'radxa/installation.json').resolve()
         if not calibration.is_file():
@@ -34,8 +34,8 @@ def configure(output, calibration=None, port='/dev/hd1910-servo', motion=False, 
             raise ValueError('Use the actual verified device calibration; example is read-only')
         text = text.replace(old_bus, 'feetech:' + str(output / 'feetech.json'))
         config = dict(port=port, installation=str(calibration), imu_bus='/dev/i2c-4',
-                      imu_address=75, allow_motion=motion, servo_gain_profile='luwu_runtime',
-                      scheduled_bus=True, luwu_native=True)
+                      imu_address=75, allow_motion=motion, servo_gain_profile='reference_runtime',
+                      scheduled_bus=True, reference_native=True)
         (output / 'feetech.json').write_text(json.dumps(config, indent=2) + '\n')
     (output / 'params.toml').write_text(text)
     return output

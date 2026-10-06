@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """External HLS1910 M6 reference, not an identified HD1910M calibration.
 
-Parameters: LuwuDynamics/xgoduck_rl, commit
-326d77a1122870bdefa2c36403937502c958e69c, robot/xgoduck/params/1910_m6.json.
+Parameters: ReferenceDynamics/hd1910_rl, commit
+326d77a1122870bdefa2c36403937502c958e69c, robot/hd1910/params/1910_m6.json.
 Reuse BAM's control/friction equations, not a second implementation. The fit's
 q_offset is a testbench offset; command_delay is not consumed by this controller.
 Neither is a robot installation calibration. Explicit lag is in physics steps.
@@ -14,10 +14,10 @@ from bam.model import load_model
 from bam.mujoco import MujocoController
 
 PROFILE_PATH = Path(os.environ.get('MICRODUCK_BAM_PROFILE',
-    str(Path(__file__).with_name('xgoduck_1910_m6.json')))).resolve()
+    str(Path(__file__).with_name('hd1910_1910_m6.json')))).resolve()
 KP_FW = float(os.environ.get('MICRODUCK_BAM_KP', '5'))
 if KP_FW not in (5., 6.):
-    raise ValueError('supported M6 gains: upstream training P5 or Luwu runtime P6')
+    raise ValueError('supported M6 gains: upstream training P5 or Reference runtime P6')
 TASK_ID = 'Mjlab-Velocity-Flat-MicroDuck-HD1910-XgoBam' + ('-P6-Slew' if KP_FW == 6 else '-Slew')
 
 

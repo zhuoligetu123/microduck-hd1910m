@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unmodified Luwu weights, LOCAL geometry/calibration, simulated HD1910/BNO I/O.
+"""Unmodified Reference weights, LOCAL geometry/calibration, simulated HD1910/BNO I/O.
 
 No serial port, SSH, enable command, or live policy replacement. Every case is
 isolated; episodic pick/roll switches back to idle walk without resetting physics.
@@ -17,14 +17,14 @@ import mujoco
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]/'radxa'))
-from luwu_policy import (LocalCalibration, LuwuSuite, JOINTS, MODEL_DIR, INSTALLATION,
+from reference_policy import (LocalCalibration, ReferenceSuite, JOINTS, MODEL_DIR, INSTALLATION,
                          rotate, conjugate, BodyFeedbackFilter)
 from replay_hd1910 import load_replay_model, step_control_period
 from replay_m6_recovery import floor_clearance, recovery_success
-from evaluate_luwu_direct import foot_vertices, clearance, summarize_swings
+from evaluate_reference_direct import foot_vertices, clearance, summarize_swings
 from mjlab_microduck.tasks.mdp import (_HEAD_TOP_AXIS, _HEAD_TOP_DOWN_MIN,
     _HEAD_LATCH_LO, _HEAD_LATCH_HI, _FLAT_FULL, _FLAT_ZERO)
-from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH
+from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH
 
 
 class SimulatedFeedback:
@@ -111,7 +111,7 @@ def run_case(args, case, seed, suite, cal):
     data.qpos[2] += .002-floor_clearance(model, data)
     mujoco.mj_forward(model, data)
     motor.reset(data.qpos)
-    feedback = SimulatedFeedback(model,data,motor,cal,args.sensor_filter=='luwu-bno')
+    feedback = SimulatedFeedback(model,data,motor,cal,args.sensor_filter=='reference-bno')
     feet = foot_vertices(model)
     feet_ids = {g for g,_ in feet}
     floor = model.geom('floor').id
@@ -278,13 +278,13 @@ def main():
     parser.add_argument('--delay-steps',type=int,choices=range(3,11),default=4)
     parser.add_argument('--feedback-delay-ms',type=int,choices=(0,20,40,60),default=0)
     parser.add_argument('--output-mode',choices=('upstream-saturate','local-strict'),default='upstream-saturate')
-    parser.add_argument('--sensor-filter',choices=('luwu-bno','none'),default='luwu-bno')
+    parser.add_argument('--sensor-filter',choices=('reference-bno','none'),default='reference-bno')
     parser.add_argument('--video',action='store_true')
     args = parser.parse_args()
     if not math.isfinite(args.seconds) or args.seconds < 4:
         parser.error('seconds must be finite and >=4')
     args.output.mkdir(parents=True,exist_ok=True)
-    suite, cal = LuwuSuite(args.models), LocalCalibration(args.installation)
+    suite, cal = ReferenceSuite(args.models), LocalCalibration(args.installation)
     selected = [c for c in cases() if args.cases is None or c[0] in args.cases]
     if not selected or (args.cases and set(args.cases)-{c[0] for c in selected}):
         parser.error('unknown case')
@@ -293,7 +293,7 @@ def main():
                   bam_profile_path=str(PROFILE_PATH),
                   bam_profile_sha256=hashlib.sha256(PROFILE_PATH.read_bytes()).hexdigest(),
                   source_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in
-                      (Path(__file__),Path(__file__).resolve().parents[2]/'radxa/luwu_policy.py')},
+                      (Path(__file__),Path(__file__).resolve().parents[2]/'radxa/reference_policy.py')},
                   unavailable_published_weights=['sitstand','kick_left','kick_right'],
                   policy_hashes={r:hashlib.sha256(p.path.read_bytes()).hexdigest()
                                  for r,p in suite.policies.items()}, cases=[])

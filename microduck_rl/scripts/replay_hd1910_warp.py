@@ -24,7 +24,7 @@ def make_replay_cfg(seconds, bounded=False, slew=False, max_step_rad=.10, voltag
     if slew:
         factory = make_slew_hd1910_velocity_env_cfg
     if bam_reference:
-        from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+        from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
         from functools import partial
         factory = partial(make_xgo_bam_env_cfg, repair_variant=repair_variant)
     cfg=factory(play=True)

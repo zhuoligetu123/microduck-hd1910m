@@ -54,7 +54,7 @@ def replay_posture_cpu(args, meta):
     import numpy as np
     from replay_hd1910 import load_replay_model, ReplayPolicy, DEFAULT_POSE, step_control_period, validate_metadata
     from mjlab_microduck.tasks.microduck_sitstand_env_cfg import STAND_Z, SIT_Z
-    m6 = meta.get('actuator_backend') == 'xgoduck_bam_m6'
+    m6 = meta.get('actuator_backend') == 'hd1910_bam_m6'
     model,data,motor = (load_replay_model(7.4,bam_reference=True,repair_variant='sitstand')
                         if m6 else load_replay_model(7.4,posture=True))
     policy = ReplayPolicy(model,data,bam_ctrl=motor,new_cmd_obs=True,use_projected_gravity=True,
@@ -176,7 +176,7 @@ def main():
     profile = args.policy.parent / 'motor_calibration.json'
     if hashlib.sha256(profile.read_bytes()).hexdigest() != meta['calibration_sha256']:
         raise ValueError('policy/profile digest mismatch')
-    if meta.get('actuator_backend') == 'xgoduck_bam_m6':
+    if meta.get('actuator_backend') == 'hd1910_bam_m6':
         os.environ['MICRODUCK_BAM_PROFILE'] = str(profile.resolve())
         os.environ['MICRODUCK_BAM_KP'] = meta['kp_fw']
         if args.engine != 'cpu':
@@ -184,7 +184,7 @@ def main():
     else:
         os.environ['MICRODUCK_HD1910_REFERENCE'] = str(profile.resolve())
         os.environ['MICRODUCK_HD1910_SUITE'] = '1'
-    from mjlab_microduck.tasks.xgoduck_bam import SITSTAND_TASK_ID
+    from mjlab_microduck.tasks.hd1910_bam import SITSTAND_TASK_ID
     if args.posture_cycle and meta.get('task_id') not in (
             'Mjlab-SitStand-Flat-MicroDuck-HD1910-Reference-Slew',
             'Mjlab-SitStand-Flat-MicroDuck-HD1910-Reference-Slew-Refine',

@@ -603,7 +603,7 @@ impl Mode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, default)]
 pub struct PolicyParams {
-    pub luwu_native: bool,
+    pub reference_native: bool,
     /// Explicit operator-supported M6 trial; never enabled by default.
     pub supported_m6: bool,
     /// Whether to load a policy at all.
@@ -1205,7 +1205,7 @@ impl std::fmt::Display for Slot {
 /// "walk or roller?" to know the action scale.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ResolvedPolicy {
-    pub luwu_native: bool,
+    pub reference_native: bool,
     pub supported_m6: bool,
     pub enabled: bool,
     pub mode: Mode,
@@ -1300,7 +1300,7 @@ impl PolicyParams {
         // A skill whose path is the `"none"` sentinel is switched off, which is how a built-in is
         // removed without a second mechanism for it.
         resolved.retain(|s| s.resolved_path().is_some());
-        if self.luwu_native {
+        if self.reference_native {
             resolved.sort_by_key(|s| match s.name.as_str() { "recovery" => 0, "roulade" => 1, _ => 2 });
         }
         resolved
@@ -1394,7 +1394,7 @@ impl PolicyParams {
         let seat = manifest.and_then(|m| m.sitstand());
 
         ResolvedPolicy {
-            luwu_native: self.luwu_native,
+            reference_native: self.reference_native,
             supported_m6: self.supported_m6,
             enabled: self.enabled,
             mode: self.mode,
@@ -1433,7 +1433,7 @@ impl PolicyParams {
                     Mode::Walk => 4.0,
                     Mode::Roller => 3.0,
                 }),
-            ground_pick_end_phase: if self.luwu_native { 1.0 } else { pick
+            ground_pick_end_phase: if self.reference_native { 1.0 } else { pick
                 .map(|t| t.end_phase)
                 .unwrap_or(DEFAULT_GROUND_PICK_END_PHASE) },
             ground_pick_action_scale: self
@@ -1514,7 +1514,7 @@ pub struct SafetyParams {
 impl Default for PolicyParams {
     fn default() -> Self {
         Self {
-            luwu_native: false,
+            reference_native: false,
             supported_m6: false,
             enabled: true,
             mode: Mode::Walk,

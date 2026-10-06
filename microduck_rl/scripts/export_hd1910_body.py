@@ -14,7 +14,7 @@ parser.add_argument('--bam-reference', action='store_true')
 parser.add_argument('--policy', type=Path, help='Validate and bind the ONNX to this simulation bundle')
 args = parser.parse_args()
 if args.bam_reference:
-    from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH, KP_FW
+    from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH, KP_FW
 args.output.mkdir(parents=True, exist_ok=True)
 model, _, _ = load_replay_model(7.4, bam_reference=args.bam_reference)
 policy_binding = {}
@@ -40,7 +40,7 @@ shutil.copyfile(PROFILE_PATH, args.output/'motor_calibration.json')
     'profile_sha256': hashlib.sha256(PROFILE_PATH.read_bytes()).hexdigest(),
     'physics_hz': 200, 'delay_steps': 4, 'voltage': 7.4,
     **({'kp_fw': KP_FW, 'kd_fw': 20, 'kd_modelled': False} if args.bam_reference else {}),
-    'actuator_backend': 'xgoduck_bam_m6' if args.bam_reference else 'hd1910_reference_pd',
+    'actuator_backend': 'hd1910_bam_m6' if args.bam_reference else 'hd1910_reference_pd',
     'calibrated': False, 'hardware_tested': False,
 }, indent=2) + '\n')
 print(path)

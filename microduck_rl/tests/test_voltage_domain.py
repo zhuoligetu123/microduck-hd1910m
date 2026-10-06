@@ -2,11 +2,11 @@ from copy import deepcopy
 from dataclasses import asdict
 
 import pytest
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg, configure_voltage_domain
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg, configure_voltage_domain
 
 
 def test_only_voltage_changes_and_baseline_is_unchanged():
-    base = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    base = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(base)
     configure_voltage_domain(candidate, 'static_home')
     before = asdict(base)

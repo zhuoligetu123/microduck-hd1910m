@@ -2,7 +2,7 @@ import json
 import math
 import pytest
 from mjlab_microduck.actuator.radxa_alignment import JOINTS, alignment_contract, geometry_contract
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 
 
 def installation():

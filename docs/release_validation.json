@@ -13,6 +13,7 @@
   },
   "python_contract_tests": 12,
   "release_config_tests": 3,
+  "four_graph_hash_contract_and_scheduler": "passed with real ONNX graphs and native ORT",
   "native_sim_protocol": {
     "physical_hardware": false,
     "physics": "MuJoCo BAM M6 with fixed base support",
@@ -36,8 +37,8 @@
   "release_launcher": "passed, isolated simulation health online; no physical I/O",
   "apk": {
     "package": "com.microduck.control",
-    "version": "0.1.1",
-    "version_code": 2,
+    "version": "0.1.2",
+    "version_code": 3,
     "signature": "APK v2 verified; internal debug-signed build",
     "source_uploaded": false
   },
@@ -47,9 +48,13 @@
     "all_resolve": true
   },
   "assets": {
+    "app_getup_verified.mp4": {
+      "sha256": "e3fd45ca7874e1dc8d70972fe5b4ac179e7ceeaf9010930f08dc6002a5e7f497",
+      "bytes": 13198399
+    },
     "app_preview.mp4": {
-      "sha256": "9732a597cc0804089e4e4cfbcdf8afdedcee639b6410158c1042408e2ff11702",
-      "bytes": 30772253,
+      "sha256": "c8620ee1fb3c39b531b37896718a5388252034abb0339b798b3b277c0dc81db2",
+      "bytes": 75058759,
       "video": {
         "programs": [],
         "streams": [
@@ -65,21 +70,33 @@
         }
       }
     },
+    "app_roll_verified.mp4": {
+      "sha256": "7d55d859bccb23e4d920296161ac1eccfda5b748dbafb97d21a73f7a627f1ec1",
+      "bytes": 16879677
+    },
     "microduck-hd1910m-arm64.tar.gz": {
-      "sha256": "1597937fa61866a93133809e49c37fcaa5a7bc19f726c4850b46c89947e0c464",
-      "bytes": 9310900
+      "sha256": "3414b257235bd4ead3ab7da5c460e3ddffb98056053932ce523364cb8e55efa1",
+      "bytes": 9313415
     },
     "microduck.apk": {
-      "sha256": "f3ec46a96795f913a3d3b1db155d492b4278587793eff68dfff9fb1788b8c8a4",
-      "bytes": 8667946
+      "sha256": "9da6ece42553560e3895f96fab1d4a703fa26bd22b7719bfec7576817ee009ac",
+      "bytes": 8505780
+    },
+    "microduck_explainer.mp4": {
+      "sha256": "123203bf6aa4d9280e1725c8997e1f5b29d40cba1ed055af4937342e2c653502",
+      "bytes": 154356651
     },
     "microduck_exploded.gif": {
       "sha256": "f60b97aa39252ff6ca7fed8ee69a2e2c6f80231c805c586dea14033b2570cedd",
       "bytes": 21798437
     },
+    "mujoco_getup_verified.mp4": {
+      "sha256": "198df694001adbf39d858bd8865f7f1640a1bc46068698ff65b43ba7b2358b09",
+      "bytes": 23382040
+    },
     "mujoco_preview.mp4": {
-      "sha256": "cd8aef502dd99f73627ef6800374361aaab4886e6f3913c2f026c31cbcdd0478",
-      "bytes": 46039850,
+      "sha256": "c400a16f4d8198fe81a9ee40a486eb7e070e2be160a1772fda9d06bef286e3bd",
+      "bytes": 138865484,
       "video": {
         "programs": [],
         "streams": [
@@ -94,12 +111,17 @@
           "duration": "180.000000"
         }
       }
+    },
+    "mujoco_roll_verified.mp4": {
+      "sha256": "4650f1b5316eaed6a2ce7c4822b2eb8bdd03d521bede82071e75c6b32f340612",
+      "bytes": 31118316
     }
   },
   "limits": [
     "No new physical robot test",
     "No new long training run",
     "Native protocol simulation uses fixed base support, not a gait qualification",
-    "Historical free-body video includes skill failures; see video_validation.json"
+    "Front recovery and dynamic roll landing passed one free-body recording; see skill_validation.json",
+    "Other initial conditions still fail; no general recovery guarantee"
   ]
 }

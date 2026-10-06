@@ -8,18 +8,18 @@ import torch
 from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts'))
-from replay_hd1910 import LuwuReplayPolicy, ReplayPolicy, luwu_policy_pose
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg, configure_head_bias_course
+from replay_hd1910 import ReferenceReplayPolicy, ReplayPolicy, reference_policy_pose
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg, configure_head_bias_course
 from mjlab_microduck.tasks.mdp import HdLowSpeedCommand, standing_envs_curriculum
 
 
 @pytest.mark.parametrize('height', [12., 15., 20., 25.])
 def test_unified_course_has_one_sole_target_without_changing_execution(height):
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import (configure_clearance_course,
+    from mjlab_microduck.tasks.hd1910_bam import (configure_clearance_course,
         configure_airtime_height_gate, configure_bilateral_clearance_bonus)
     from mjlab_microduck.tasks.mdp import hd_sole_swing_height
-    cfg = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    cfg = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     configure_airtime_height_gate(cfg, 'gentle')
     configure_bilateral_clearance_bonus(cfg, 1.)
     before = deepcopy(cfg)
@@ -43,7 +43,7 @@ def test_raw_history_and_filtered_output_are_distinct(monkeypatch):
         policy.last_action = np.ones(14, dtype=np.float32)
         return policy.last_action.copy()
     monkeypatch.setattr(ReplayPolicy, 'infer', infer)
-    policy = LuwuReplayPolicy.__new__(LuwuReplayPolicy)
+    policy = ReferenceReplayPolicy.__new__(ReferenceReplayPolicy)
     policy.action_alpha = .45
     policy.reset_joint_observation_history()
     np.testing.assert_allclose(policy.infer(), .55)
@@ -58,10 +58,10 @@ def test_external_contract_rejects_local_bounded_history():
     meta = dict(joint_names=','.join(names), action_scale='1.0',
         observation_names='base_ang_vel,projected_gravity,joint_pos,joint_vel,actions,command,head_command,body_command',
         default_joint_pos=','.join(['.349']*14))
-    np.testing.assert_allclose(luwu_policy_pose(meta, names), .349)
+    np.testing.assert_allclose(reference_policy_pose(meta, names), .349)
     meta['action_semantics'] = 'bounded_slew_home_delta_v2'
     with pytest.raises(ValueError):
-        luwu_policy_pose(meta, names)
+        reference_policy_pose(meta, names)
 
 
 def test_scheduled_head_command_reaches_observation_slots():
@@ -80,7 +80,7 @@ def test_scheduled_head_command_reaches_observation_slots():
 
 
 def test_reward_reset_preserves_physics_and_drops_added_penalties():
-    cfg = make_xgo_bam_env_cfg(repair_variant='gait_luwu_recipe_v18')
+    cfg = make_xgo_bam_env_cfg(repair_variant='gait_reference_recipe_v18')
     base = make_xgo_bam_env_cfg()
     payload = make_xgo_bam_env_cfg(repair_variant='gait_payload_v8')
     assert cfg.rewards == base.rewards
@@ -94,8 +94,8 @@ def test_reward_reset_preserves_physics_and_drops_added_penalties():
 
 
 def test_tracking_tolerance_scales_with_command_range_not_weight():
-    base = make_xgo_bam_env_cfg(repair_variant='gait_luwu_recipe_v18')
-    cfg = make_xgo_bam_env_cfg(repair_variant='gait_luwu_scaled_v19')
+    base = make_xgo_bam_env_cfg(repair_variant='gait_reference_recipe_v18')
+    cfg = make_xgo_bam_env_cfg(repair_variant='gait_reference_scaled_v19')
     for name, ratio in [('track_linear_velocity', .15/.4),
                         ('track_angular_velocity', .5/1.)]:
         assert cfg.rewards[name].weight == base.rewards[name].weight
@@ -107,8 +107,8 @@ def test_tracking_tolerance_scales_with_command_range_not_weight():
 
 def test_idle_ablation_changes_only_task_fraction_and_its_curriculum():
     from copy import deepcopy
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_recipe_v18')
-    b = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_v20')
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_recipe_v18')
+    b = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_v20')
     assert b.commands['twist'].rel_standing_envs == .02
     assert a.commands['twist'].rel_standing_envs == .20
     adjusted = deepcopy(b.commands)
@@ -124,7 +124,7 @@ def test_idle_ablation_changes_only_task_fraction_and_its_curriculum():
 
 @pytest.mark.parametrize('idle_fraction', [0., .02, .2, .25, 1.])
 def test_sampled_idle_fraction_matches_live_config(idle_fraction):
-    cfg = make_xgo_bam_env_cfg(repair_variant='gait_luwu_recipe_v18').commands['twist']
+    cfg = make_xgo_bam_env_cfg(repair_variant='gait_reference_recipe_v18').commands['twist']
     cfg.rel_standing_envs = idle_fraction
     count = 50000
     command = SimpleNamespace(cfg=cfg, device='cpu',
@@ -147,7 +147,7 @@ def test_sampled_idle_fraction_matches_live_config(idle_fraction):
 
 
 def test_curriculum_updates_live_command_not_a_config_copy():
-    cfg = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_v20')
+    cfg = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_v20')
     term = SimpleNamespace(cfg=cfg.commands['twist'])
     class Manager:
         def get_term(self, name):
@@ -163,8 +163,8 @@ def test_curriculum_updates_live_command_not_a_config_copy():
 
 def test_curriculum_scaled_ablation_only_changes_tracking_tolerance():
     from copy import deepcopy
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_v20')
-    b = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_v20')
+    b = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     rewards = deepcopy(b.rewards)
     for name, ratio in [('track_linear_velocity', .15/.4),
                         ('track_angular_velocity', .5/1.)]:
@@ -179,9 +179,9 @@ def test_curriculum_scaled_ablation_only_changes_tracking_tolerance():
 @pytest.mark.parametrize('play', [False, True])
 def test_linear_only_ablation_changes_only_yaw_tolerance(play):
     from copy import deepcopy
-    a = make_xgo_bam_env_cfg(play=play, repair_variant='gait_luwu_curriculum_scaled_v21')
-    b = make_xgo_bam_env_cfg(play=play, repair_variant='gait_luwu_linear_only_v22')
-    original = make_xgo_bam_env_cfg(play=play, repair_variant='gait_luwu_curriculum_v20')
+    a = make_xgo_bam_env_cfg(play=play, repair_variant='gait_reference_curriculum_scaled_v21')
+    b = make_xgo_bam_env_cfg(play=play, repair_variant='gait_reference_linear_only_v22')
+    original = make_xgo_bam_env_cfg(play=play, repair_variant='gait_reference_curriculum_v20')
     assert b.rewards['track_angular_velocity'] == original.rewards['track_angular_velocity']
     assert b.rewards['track_linear_velocity'] == a.rewards['track_linear_velocity']
     rewards = deepcopy(b.rewards)
@@ -191,7 +191,7 @@ def test_linear_only_ablation_changes_only_yaw_tolerance(play):
         assert getattr(a, field) == getattr(b, field)
 
 
-@pytest.mark.parametrize('variant', ['gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'])
+@pytest.mark.parametrize('variant', ['gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'])
 @pytest.mark.parametrize('play', [False, True])
 def test_head_bias_ablation_leaves_every_other_term_unchanged(variant, play):
     from copy import deepcopy
@@ -210,7 +210,7 @@ def test_head_bias_ablation_leaves_every_other_term_unchanged(variant, play):
 def test_head_bias_boundary_changes_live_reward_only():
     from mjlab_microduck.tasks.mdp import reward_weight
     from copy import deepcopy
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     b = deepcopy(a)
     configure_head_bias_course(b, 'frozen')
     for cfg, expected in ((a, 1.), (b, 0.)):
@@ -228,8 +228,8 @@ def test_head_bias_boundary_changes_live_reward_only():
 @pytest.mark.parametrize('weight', [-.2, -.1])
 def test_action_rate_ablation_changes_only_penalty_and_schedule(play, weight):
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_action_rate_weight
-    a = make_xgo_bam_env_cfg(play=play, repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_action_rate_weight
+    a = make_xgo_bam_env_cfg(play=play, repair_variant='gait_reference_curriculum_scaled_v21')
     b = deepcopy(a)
     configure_action_rate_weight(b, weight)
     assert b.rewards['action_rate_l2'].weight == weight
@@ -243,7 +243,7 @@ def test_action_rate_ablation_changes_only_penalty_and_schedule(play, weight):
 
 @pytest.mark.parametrize('weight', [float('nan'), float('inf'), .1])
 def test_action_rate_ablation_rejects_invalid_penalty(weight):
-    from mjlab_microduck.tasks.xgoduck_bam import configure_action_rate_weight
+    from mjlab_microduck.tasks.hd1910_bam import configure_action_rate_weight
     with pytest.raises(ValueError, match='nonpositive'):
         configure_action_rate_weight(SimpleNamespace(), weight)
 
@@ -285,8 +285,8 @@ def test_axis_tolerance_changes_only_uncommanded_axis_penalty():
 
 def test_axis_tolerance_ablation_keeps_all_other_terms():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_tracking_axes
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_tracking_axes
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     b = deepcopy(a)
     configure_tracking_axes(a, 'coupled')
     configure_tracking_axes(b, 'separate')
@@ -301,9 +301,9 @@ def test_axis_tolerance_ablation_keeps_all_other_terms():
 
 def test_swing_reference_keeps_target_weight_and_other_terms():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_swing_reference
+    from mjlab_microduck.tasks.hd1910_bam import configure_swing_reference
     from mjlab_microduck.tasks.mdp import hd_sole_swing_height
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     b = deepcopy(a)
     configure_swing_reference(a, 'ray')
     configure_swing_reference(b, 'collision')
@@ -319,8 +319,8 @@ def test_swing_reference_keeps_target_weight_and_other_terms():
 
 def test_standing_fraction_freeze_preserves_all_other_terms():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_standing_fraction
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_standing_fraction
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     b = deepcopy(a)
     configure_standing_fraction(b, .05)
     assert b.commands['twist'].rel_standing_envs == .05
@@ -332,7 +332,7 @@ def test_standing_fraction_freeze_preserves_all_other_terms():
 
 
 def test_mirror_loss_never_augments_unmirrored_privileged_critic():
-    from mjlab_microduck.tasks.xgoduck_bam import mirror_loss_config
+    from mjlab_microduck.tasks.hd1910_bam import mirror_loss_config
     assert mirror_loss_config(.1)['mirror_loss_coeff'] == .1
     assert mirror_loss_config(.1)['use_mirror_loss']
     assert not mirror_loss_config(.1)['use_data_augmentation']
@@ -394,8 +394,8 @@ def test_tracking_mean_does_not_hide_vertical_instability_or_steady_error():
 
 def test_tracking_mean_changes_reward_timing_not_policy_contract():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_tracking_mean
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_linear_only_v22')
+    from mjlab_microduck.tasks.hd1910_bam import configure_tracking_mean
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_linear_only_v22')
     b = deepcopy(a)
     configure_tracking_mean(a, 0.)
     configure_tracking_mean(b, .2)
@@ -411,9 +411,9 @@ def test_tracking_mean_changes_reward_timing_not_policy_contract():
 
 def test_straight_yaw_changes_only_one_reward_and_rejects_conflicting_mean():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import (
+    from mjlab_microduck.tasks.hd1910_bam import (
         configure_straight_yaw, configure_tracking_axes, configure_tracking_mean)
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     configure_tracking_axes(a, 'separate_yaw')
     b = deepcopy(a)
     configure_straight_yaw(b, .1)
@@ -463,9 +463,9 @@ def test_straight_yaw_preserves_turn_idle_and_prices_persistent_drift():
 
 def test_airtime_quality_does_not_add_a_new_reward_or_change_weight():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_airtime_height_gate
+    from mjlab_microduck.tasks.hd1910_bam import configure_airtime_height_gate
     from mjlab_microduck.tasks.mdp import hd_sole_swing_height
-    a = make_xgo_bam_env_cfg(repair_variant='gait_luwu_linear_only_v22')
+    a = make_xgo_bam_env_cfg(repair_variant='gait_reference_linear_only_v22')
     b = deepcopy(a)
     configure_airtime_height_gate(a, 'off')
     configure_airtime_height_gate(b, 'on')
@@ -483,8 +483,8 @@ def test_airtime_quality_does_not_add_a_new_reward_or_change_weight():
 def test_feedback_age_course_only_changes_training_snapshot_lag():
     from copy import deepcopy
     import pytest
-    from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg, configure_feedback_age
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_linear_only_v22')
+    from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg, configure_feedback_age
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_linear_only_v22')
     candidate = deepcopy(parent)
     configure_feedback_age(candidate, 1)
     term = candidate.observations['actor'].terms['joint_state']
@@ -502,8 +502,8 @@ def test_feedback_age_course_only_changes_training_snapshot_lag():
 def test_bilateral_bonus_keeps_all_existing_rewards_and_interfaces():
     from copy import deepcopy
     import pytest
-    from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg, configure_bilateral_clearance_bonus
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg, configure_bilateral_clearance_bonus
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_bilateral_clearance_bonus(candidate, 1.)
     bonus = candidate.rewards.pop('hd_bilateral_clearance_quality')
@@ -522,7 +522,7 @@ def test_resume_exploration_cap_preserves_actor_mean_and_other_optimizer_state()
     from types import SimpleNamespace
     import pytest
     import torch
-    from mjlab_microduck.tasks.xgoduck_bam import cap_resume_exploration
+    from mjlab_microduck.tasks.hd1910_bam import cap_resume_exploration
     mean = torch.nn.Parameter(torch.tensor([.2, -.1]))
     std = torch.nn.Parameter(torch.tensor([.5, .1]))
     optimizer = torch.optim.Adam([mean, std], lr=.001)
@@ -546,8 +546,8 @@ def test_resume_exploration_cap_preserves_actor_mean_and_other_optimizer_state()
 def test_hip_roll_tolerance_does_not_change_standing_or_other_terms():
     from copy import deepcopy
     import pytest
-    from mjlab_microduck.tasks.xgoduck_bam import configure_walking_hip_roll_std
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_walking_hip_roll_std
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_walking_hip_roll_std(candidate, .15)
     for regime in ('std_walking', 'std_running'):
@@ -564,8 +564,8 @@ def test_hip_roll_tolerance_does_not_change_standing_or_other_terms():
 def test_airtime_shift_retains_interval_width_weights_and_interfaces():
     from copy import deepcopy
     import pytest
-    from mjlab_microduck.tasks.xgoduck_bam import configure_airtime_window_shift
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_airtime_window_shift
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_airtime_window_shift(candidate, .06)
     params = candidate.rewards['air_time'].params
@@ -584,8 +584,8 @@ def test_airtime_shift_retains_interval_width_weights_and_interfaces():
 def test_low_obstacle_course_retains_robot_rewards_and_observation_contract():
     from copy import deepcopy
     import pytest
-    from mjlab_microduck.tasks.xgoduck_bam import configure_terrain_course, configure_bilateral_clearance_bonus
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_terrain_course, configure_bilateral_clearance_bonus
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     flat, obstacle = deepcopy(parent), deepcopy(parent)
     configure_terrain_course(flat, 'flat')
     configure_terrain_course(obstacle, 'microblocks')
@@ -613,8 +613,8 @@ def test_twelve_mm_obstacles_are_above_current_sole_clearance_not_half_height():
     import numpy as np
     import mujoco
     from mjlab.terrains.terrain_generator import TerrainGenerator
-    from mjlab_microduck.tasks.xgoduck_bam import configure_terrain_course
-    cfg = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_terrain_course
+    cfg = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     configure_terrain_course(cfg, 'microblocks12')
     generator = TerrainGenerator(cfg.scene.terrain.terrain_generator)
     spec = mujoco.MjSpec()
@@ -628,8 +628,8 @@ def test_twelve_mm_obstacles_are_above_current_sole_clearance_not_half_height():
 def test_slew_demand_ablation_keeps_actuation_and_existing_rewards():
     from copy import deepcopy
     import pytest
-    from mjlab_microduck.tasks.xgoduck_bam import configure_slew_demand_weight
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_slew_demand_weight
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_slew_demand_weight(candidate, -.2)
     assert candidate.rewards.pop('hd_slew_demand').weight == -.2
@@ -660,8 +660,8 @@ def test_slew_demand_distinguishes_hidden_requests_with_identical_applied_step()
 
 def test_forward_curriculum_only_changes_straight_direction_sampling():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_forward_probability
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_forward_probability
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_forward_probability(candidate, .85)
     for field in ('rewards', 'curriculum', 'events', 'actions', 'observations', 'terminations'):
@@ -689,8 +689,8 @@ def test_forward_curriculum_only_changes_straight_direction_sampling():
 
 def test_flexion_tolerance_changes_only_moving_sagittal_pose_prior_once():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_walking_flexion_scale
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_walking_flexion_scale
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_walking_flexion_scale(candidate, 2.)
     for regime in ('std_walking', 'std_running'):
@@ -708,8 +708,8 @@ def test_flexion_tolerance_changes_only_moving_sagittal_pose_prior_once():
 
 def test_yaw_decoupling_preserves_independent_balance_costs_and_command_scale():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_tracking_axes, configure_tracking_mean
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_tracking_axes, configure_tracking_mean
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_tracking_axes(parent, 'separate')
     configure_tracking_axes(candidate, 'separate_yaw')
@@ -742,7 +742,7 @@ def test_yaw_reward_does_not_disappear_during_roll_with_explicit_decoupling():
 
 def test_fixed_exploration_survives_optimizer_updates_without_changing_actor_mean():
     from rsl_rl.modules.distribution import GaussianDistribution
-    from mjlab_microduck.tasks.xgoduck_bam import freeze_exploration
+    from mjlab_microduck.tasks.hd1910_bam import freeze_exploration
     distribution = GaussianDistribution(14, init_std=.5)
     mean = torch.nn.Parameter(torch.linspace(-.1, .1, 14))
     optimizer = torch.optim.Adam([mean, distribution.std_param], lr=.01)
@@ -769,8 +769,8 @@ def test_fixed_exploration_survives_optimizer_updates_without_changing_actor_mea
 
 def test_latent_action_rate_changes_only_reward_measurement_not_action_contract():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_action_rate_domain
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_action_rate_domain
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_action_rate_domain(candidate, 'latent')
     term = SimpleNamespace(raw_action=torch.tensor([[.1], [.1]]),
@@ -793,8 +793,8 @@ def test_latent_action_rate_changes_only_reward_measurement_not_action_contract(
 
 def test_clearance_course_changes_only_bonus_target_without_relaxing_final_acceptance():
     from copy import deepcopy
-    from mjlab_microduck.tasks.xgoduck_bam import configure_bilateral_clearance_bonus
-    parent = make_xgo_bam_env_cfg(repair_variant='gait_luwu_curriculum_scaled_v21')
+    from mjlab_microduck.tasks.hd1910_bam import configure_bilateral_clearance_bonus
+    parent = make_xgo_bam_env_cfg(repair_variant='gait_reference_curriculum_scaled_v21')
     candidate = deepcopy(parent)
     configure_bilateral_clearance_bonus(parent, 1.)
     configure_bilateral_clearance_bonus(candidate, 1., .012)

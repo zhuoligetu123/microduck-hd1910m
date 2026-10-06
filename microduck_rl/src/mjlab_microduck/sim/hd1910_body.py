@@ -23,8 +23,8 @@ class HdWorld(World):
             raise ValueError('unsupported simulation bundle schema')
         profile_path, controller = PROFILE_PATH, Hd1910CpuController
         backend = meta.get('actuator_backend', 'hd1910_reference_pd')
-        if backend == 'xgoduck_bam_m6':
-            from ..actuator.cpu_xgoduck_bam import PROFILE_PATH as profile_path, XgoBamCpuController as controller
+        if backend == 'hd1910_bam_m6':
+            from ..actuator.cpu_hd1910_bam import PROFILE_PATH as profile_path, XgoBamCpuController as controller
         elif backend != 'hd1910_reference_pd':
             raise ValueError('unsupported actuator backend')
         if meta.get('bundle_schema') == 2:
@@ -50,7 +50,7 @@ class HdWorld(World):
         self.lock = threading.Lock()
         self.bodies = []
         self.state_log = None
-        if backend == 'xgoduck_bam_m6':
+        if backend == 'hd1910_bam_m6':
             self.motor = controller(self.model, self.data, meta['voltage'], meta['delay_steps'],
                                     profile_path=profile_path, kp_fw=meta.get('kp_fw', 5.))
         else:

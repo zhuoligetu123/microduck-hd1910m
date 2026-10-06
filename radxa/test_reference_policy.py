@@ -6,11 +6,11 @@ import unittest
 
 import numpy as np
 
-from luwu_policy import (LocalCalibration, LuwuPolicy, LuwuSuite, JOINTS,
+from reference_policy import (LocalCalibration, ReferencePolicy, ReferenceSuite, JOINTS,
                          RAD_TICK, RAD_SPEED, rotate, conjugate, BodyFeedbackFilter)
 
 
-class LuwuContractTest(unittest.TestCase):
+class ReferenceContractTest(unittest.TestCase):
     def setUp(self):
         self.cal = LocalCalibration()
 
@@ -48,7 +48,7 @@ class LuwuContractTest(unittest.TestCase):
             np.testing.assert_allclose(gravity, rotate(conjugate(world_body), [0,0,-1]), atol=1e-14)
 
     def test_metadata_home_not_encoder_zero(self):
-        walk, roll = LuwuPolicy('walk'), LuwuPolicy('roulade')
+        walk, roll = ReferencePolicy('walk'), ReferencePolicy('roulade')
         self.assertAlmostEqual(walk.home[2], -.349)
         self.assertAlmostEqual(roll.home[2], -.419)
         for policy in (walk, roll):
@@ -58,7 +58,7 @@ class LuwuContractTest(unittest.TestCase):
 
     def test_raw_history_and_ema(self):
         for role in ('walk','getup','pick','roulade'):
-            p = LuwuPolicy(role)
+            p = ReferencePolicy(role)
             args = (p.home, np.zeros(14), [0,0,0], [0,0,-1], 0)
             obs, _ = p.observation(*args)
             raw = p.session.run(None, {p.session.get_inputs()[0].name: obs[None]})[0][0]
@@ -70,15 +70,15 @@ class LuwuContractTest(unittest.TestCase):
             np.testing.assert_array_equal(p.previous, 0)
 
     def test_pick_phase_mouth_and_getup(self):
-        p = LuwuPolicy('pick')
+        p = ReferencePolicy('pick')
         cmd, head, mouth = p.command(1, [99]*3, [99]*4)
         np.testing.assert_allclose(cmd, [0,1,0], atol=1e-15)
         self.assertAlmostEqual(mouth, math.pi/6)
         self.assertEqual(p.command(1.6)[2], 0)
-        np.testing.assert_array_equal(LuwuPolicy('getup').command(0, [1]*3)[0], 0)
+        np.testing.assert_array_equal(ReferencePolicy('getup').command(0, [1]*3)[0], 0)
 
     def test_task_switch_resets_and_unavailable_fails(self):
-        suite = LuwuSuite()
+        suite = ReferenceSuite()
         suite.select('pick', 2)
         self.assertEqual(suite.advance(5.99)[0].role, 'pick')
         self.assertEqual(suite.advance(6)[0].role, 'walk')
@@ -94,7 +94,7 @@ class LuwuContractTest(unittest.TestCase):
             self.cal.target_ticks(np.full(14, 10.))
         with self.assertRaises(ValueError):
             self.cal.target_ticks(np.full(14, float('nan')))
-        p = LuwuPolicy('walk')
+        p = ReferencePolicy('walk')
         with self.assertRaises(ValueError):
             p.observation(p.home, np.zeros(14), [0,0,0], [0,0,-9.81], 0)
 
@@ -115,7 +115,7 @@ class LuwuContractTest(unittest.TestCase):
                                           [0,0,-1]), [1,0,0], atol=1e-15)
 
     def test_getup_returns_only_after_continuous_upright(self):
-        s = LuwuSuite()
+        s = ReferenceSuite()
         s.select('getup',0)
         for i in range(40):
             self.assertFalse(s.recovery_ready([0,0,-1], i*.02))

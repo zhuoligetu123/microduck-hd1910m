@@ -29,7 +29,7 @@ fn err(e: impl std::fmt::Display) -> IoError {
 #[serde(deny_unknown_fields)]
 pub struct Config {
     #[serde(default)]
-    pub luwu_native: bool,
+    pub reference_native: bool,
     pub port: String,
     pub installation: String,
     pub imu_bus: String,
@@ -43,7 +43,7 @@ pub struct Config {
 }
 #[derive(Clone, Copy, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-pub enum ServoGainProfile { LuwuRuntime }
+pub enum ServoGainProfile { ReferenceRuntime }
 
 impl ServoGainProfile {
     fn rows(self, joints: &[Joint]) -> Vec<Vec<u8>> {
@@ -100,7 +100,7 @@ fn load_config(path: &str) -> Result<(Config, Installation)> {
 }
 
 pub struct FeetechIo {
-    luwu_native: bool,
+    reference_native: bool,
     filtered_velocity: Option<([f64; NUM_JOINTS], Instant)>,
     saturated_ids: Vec<u8>,
     port: serialport::TTYPort,
@@ -203,7 +203,7 @@ impl ThreadedFeetechIo {
     pub fn open_imu(path: &str) -> Result<std::sync::Arc<Bno08x>> {
         let (cfg, installation) = load_config(path)?;
         let imu = Bno08x::open(&cfg.imu_bus, cfg.imu_address, installation.imu_mount_wxyz)?;
-        imu.set_luwu_filter(cfg.luwu_native);
+        imu.set_reference_filter(cfg.reference_native);
         Ok(std::sync::Arc::new(imu))
     }
 
@@ -664,7 +664,7 @@ impl FeetechIo {
         let native = open_serial(&cfg.port)?;
         let ids = installation.joints.iter().map(|j| j.id).collect();
         let mut io = Self {
-            luwu_native: cfg.luwu_native,
+            reference_native: cfg.reference_native,
             filtered_velocity: None,
             saturated_ids: Vec::new(),
             port: native,
@@ -967,7 +967,7 @@ impl FeetechIo {
                 "current_a":signed([row[13],row[14]]) as f64*0.0065,
                 "torque_enabled":if self.enabled { Some(1) } else { None::<u8> }}));
         }
-        if self.luwu_native {
+        if self.reference_native {
             let now = Instant::now();
             if let Some((old, at)) = self.filtered_velocity {
                 let weight = 0.4f64.powf(now.duration_since(at).as_secs_f64() / 0.01);
@@ -976,7 +976,7 @@ impl FeetechIo {
             self.filtered_velocity = Some((out.velocities, now));
         }
         self.telemetry = serde_json::json!({"positions":out.positions,"velocities":out.velocities,
-            "luwu_native_io":self.luwu_native,"saturated_ids":self.saturated_ids,
+            "reference_native_io":self.reference_native,"saturated_ids":self.saturated_ids,
             "states":states,"joints":self.joints,"backend":"feetech_native",
             "motion_available":self.allow_motion,
             "servo_gain_profile":self.servo_gain_profile,"servo_gains_verified":self.servo_gains_verified});
@@ -1040,7 +1040,7 @@ impl RobotIo for FeetechIo {
         {
             let mut ticks = j.zero_ticks as f64 + *q / RAD_TICK * j.direction as f64;
             if !ticks.is_finite() { return Err(err("nonfinite target")); }
-            if self.luwu_native && (ticks < *low as f64 || ticks > *high as f64) {
+            if self.reference_native && (ticks < *low as f64 || ticks > *high as f64) {
                 ticks = ticks.clamp(*low as f64, *high as f64);
                 self.saturated_ids.push(j.id);
             }
@@ -1392,7 +1392,7 @@ mod tests {
             serde_json::from_str(include_str!("../../../radxa/installation.json")).unwrap();
         (
             FeetechIo {
-                luwu_native: false,
+                reference_native: false,
                 filtered_velocity: None,
                 saturated_ids: Vec::new(),
                 port: client,
@@ -1471,11 +1471,11 @@ mod tests {
     }
 
     #[test]
-    fn luwu_gains_are_volatile_per_id_and_verified() {
+    fn reference_gains_are_volatile_per_id_and_verified() {
         let (mut io, mut peer) = fixture();
-        io.servo_gain_profile = Some(ServoGainProfile::LuwuRuntime);
+        io.servo_gain_profile = Some(ServoGainProfile::ReferenceRuntime);
         let ids = io.ids.clone();
-        let rows = ServoGainProfile::LuwuRuntime.rows(&io.joints);
+        let rows = ServoGainProfile::ReferenceRuntime.rows(&io.joints);
         assert_eq!(rows[9], [10, 20]); // Physical mouth ID15, not policy index15.
         assert_eq!(rows[0], [6, 20]);
         let worker = std::thread::spawn(move || {
@@ -1492,12 +1492,12 @@ mod tests {
     }
 
     #[test]
-    fn luwu_gains_never_change_under_load_or_accept_bad_readback() {
+    fn reference_gains_never_change_under_load_or_accept_bad_readback() {
         for all_off in [false, true] {
             let (mut io, mut peer) = fixture();
-            io.servo_gain_profile = Some(ServoGainProfile::LuwuRuntime);
+            io.servo_gain_profile = Some(ServoGainProfile::ReferenceRuntime);
             let ids = io.ids.clone();
-            let rows = ServoGainProfile::LuwuRuntime.rows(&io.joints);
+            let rows = ServoGainProfile::ReferenceRuntime.rows(&io.joints);
             let worker = std::thread::spawn(move || {
                 reply_rows(&mut peer, &ids, 50, &vec![vec![5, 20]; 15]);
                 if all_off {
@@ -1516,11 +1516,11 @@ mod tests {
     }
 
     #[test]
-    fn adopted_enable_cannot_write_with_unverified_luwu_gains() {
+    fn adopted_enable_cannot_write_with_unverified_reference_gains() {
         let (mut io, peer) = fixture();
         io.allow_motion = true;
         io.healthy = Some(Instant::now());
-        io.servo_gain_profile = Some(ServoGainProfile::LuwuRuntime);
+        io.servo_gain_profile = Some(ServoGainProfile::ReferenceRuntime);
         assert!(io.write(&JointTargets::new([0.; 15])).unwrap_err().to_string().contains("P/D not verified"));
         assert_eq!(peer.bytes_to_read().unwrap(), 0);
     }
@@ -2294,9 +2294,9 @@ mod tests {
         assert!(io.set_gain(50).is_err());
     }
     #[test]
-    fn luwu_saturation_keeps_firmware_limits_ids_and_position_only_writes() {
+    fn reference_saturation_keeps_firmware_limits_ids_and_position_only_writes() {
         let (mut io, mut peer) = fixture();
-        io.allow_motion = true; io.healthy = Some(Instant::now()); io.luwu_native = true;
+        io.allow_motion = true; io.healthy = Some(Instant::now()); io.reference_native = true;
         io.limits = vec![(100,3900,80);15];
         io.write(&JointTargets::new([10.;15])).unwrap();
         let mut packet=vec![0;53];peer.read_exact(&mut packet).unwrap();

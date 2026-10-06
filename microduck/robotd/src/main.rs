@@ -1630,7 +1630,7 @@ fn try_controller(
                 return Err(PolicyError::Inference("M6 manual mode requires unscaled walk/step semantics".into()));
             }
         }
-        if policy_cfg.luwu_native {
+        if policy_cfg.reference_native {
             control::validate_hd_tuning(&tuning, 1.0)?;
             if policy_cfg.supported_m6 || policy_cfg.voltage_adapt || limp_fall
                 || policy_cfg.skills.len() != 2
@@ -1643,11 +1643,11 @@ fn try_controller(
                 || policy_cfg.skills.iter().any(|s| s.chain || s.unwind_s != 0.0 || s.command != [0.0;3]
                     || s.params.action_scale.is_some_and(|v| v != 1.0)
                     || s.params.gain_ratio.is_some_and(|v| v != 1.0)) {
-                return Err(PolicyError::Inference("Luwu task configuration/contract mismatch".into()));
+                return Err(PolicyError::Inference("Reference task configuration/contract mismatch".into()));
             }
         }
-        let loaded = if policy_cfg.luwu_native {
-            Policy::load_luwu(&paths)
+        let loaded = if policy_cfg.reference_native {
+            Policy::load_reference(&paths)
         } else if policy_cfg.supported_m6 {
             Policy::load_supported_m6(&paths, DEFAULT_STANDING_THRESHOLD)
         } else if simulation {
@@ -1796,15 +1796,15 @@ async fn control_loop<T: RobotIo>(
 
     // Loaded once here and again on a mode switch — see `build_controller`.
     let simulation = params.bus.port.starts_with("sim:");
-    if (policy_cfg.supported_m6 || policy_cfg.luwu_native) && (period != Duration::from_millis(20) || (!simulation
-        && safety.feedback().as_ref().and_then(|v| v.get("servo_gain_profile")).and_then(serde_json::Value::as_str) != Some("luwu_runtime"))) {
-        state.policy_error.store(Some(Arc::new("M6 manual mode requires 50 Hz and the Luwu P6/D20 hardware profile".into())));
+    if (policy_cfg.supported_m6 || policy_cfg.reference_native) && (period != Duration::from_millis(20) || (!simulation
+        && safety.feedback().as_ref().and_then(|v| v.get("servo_gain_profile")).and_then(serde_json::Value::as_str) != Some("reference_runtime"))) {
+        state.policy_error.store(Some(Arc::new("M6 manual mode requires 50 Hz and the Reference P6/D20 hardware profile".into())));
         return;
     }
     let mut controller = build_controller(&policy_cfg, params.safety.limp_fall, &state, simulation);
-    if policy_cfg.luwu_native && !simulation
-        && safety.feedback().as_ref().and_then(|v| v.get("luwu_native_io")).and_then(serde_json::Value::as_bool) != Some(true) {
-        state.policy_error.store(Some(Arc::new("Luwu policy requires matching native feedback/saturation profile".into())));
+    if policy_cfg.reference_native && !simulation
+        && safety.feedback().as_ref().and_then(|v| v.get("reference_native_io")).and_then(serde_json::Value::as_bool) != Some(true) {
+        state.policy_error.store(Some(Arc::new("Reference policy requires matching native feedback/saturation profile".into())));
         return;
     }
 
@@ -1975,7 +1975,7 @@ async fn control_loop<T: RobotIo>(
         voice.play("greet", false);
     }
 
-    let mut luwu_running = false;
+    let mut reference_running = false;
     while !state.shutdown.load(Ordering::Relaxed) {
         ticker.tick().await;
         let tick_start = Instant::now();
@@ -1983,7 +1983,7 @@ async fn control_loop<T: RobotIo>(
 
         if let Some(reply) = intents.take_fault_reset() {
             // A manual reset cancels every old intent; clearing never resumes motion.
-            luwu_running = false;
+            reference_running = false;
             bringup = Bringup::Limp;
             was_driving = false;
             if let Some(controller) = controller.as_mut() { controller.reset(); }
@@ -2028,16 +2028,16 @@ async fn control_loop<T: RobotIo>(
         }
         state.fallen.store(safety.fallen(), Ordering::Relaxed);
 
-        if intents.take_home_request() && policy_cfg.luwu_native {
+        if intents.take_home_request() && policy_cfg.reference_native {
             intents.stop();
-            luwu_running = false;
+            reference_running = false;
             if bringup == Bringup::Ready && let Some(sensors) = sensors.as_ref() {
                 bringup = Bringup::Homing { from: sensors.positions, since: tick_start };
             }
         }
         let snapshot = intents.snapshot();
-        if (policy_cfg.supported_m6 || policy_cfg.luwu_native) && intents.take_manual_stop() {
-            luwu_running = false;
+        if (policy_cfg.supported_m6 || policy_cfg.reference_native) && intents.take_manual_stop() {
+            reference_running = false;
             if let Some(controller) = controller.as_mut() { controller.cancel_manual_step(); }
         }
         let (gated, deadman) = safety.gate(snapshot.command, snapshot.twist_age);
@@ -2588,7 +2588,7 @@ async fn control_loop<T: RobotIo>(
                 // dropped one transaction is ordinary, and a robot that refused to ever come up
                 // because of it would be worse than one that keeps asking.
                 Err(e) => {
-                    if policy_cfg.supported_m6 || policy_cfg.luwu_native { intents.set_enabled(false); }
+                    if policy_cfg.supported_m6 || policy_cfg.reference_native { intents.set_enabled(false); }
                     tracing::warn!(error = %e, "cannot enable torque; the robot stays limp");
                 },
             }
@@ -2752,12 +2752,12 @@ async fn control_loop<T: RobotIo>(
         // And only once the ramp is done, or the policy's first step would come from wherever the
         // robot was slumped. A fall does not stop the driving, as the prototype does not
         // stop it: the policy keeps going and the humans stay in charge.
-        if policy_cfg.luwu_native && intents.take_task_request() && bringup == Bringup::Ready && snapshot.enabled {
-            luwu_running = true;
+        if policy_cfg.reference_native && intents.take_task_request() && bringup == Bringup::Ready && snapshot.enabled {
+            reference_running = true;
         }
-        if !snapshot.enabled { luwu_running = false; }
+        if !snapshot.enabled { reference_running = false; }
         let driving = snapshot.enabled
-            && (!policy_cfg.luwu_native || luwu_running)
+            && (!policy_cfg.reference_native || reference_running)
             && bringup == Bringup::Ready
             && controller.is_some()
             // The limp-fall sequence owns the robot for its duration: the whole point is
@@ -2866,9 +2866,9 @@ async fn control_loop<T: RobotIo>(
                     },
                     Err(e) => {
                         policy_step_ok = false;
-                        if policy_cfg.luwu_native {
+                        if policy_cfg.reference_native {
                             hold = sensors.positions;
-                            luwu_running = false;
+                            reference_running = false;
                         }
                         tracing::warn!(error = %e, "inference failed; holding");
                         (hold, policy_cfg.gain, false, "held".into())
@@ -3065,7 +3065,7 @@ async fn control_loop<T: RobotIo>(
         // The mouth is not part of any policy; the intent is the only thing that moves it.
         // Only while driving — a held or homing robot keeps whatever its hold pose says, so
         // a restart cannot snap a mouth.
-        if (driving || (policy_cfg.luwu_native && bringup == Bringup::Ready && snapshot.enabled))
+        if (driving || (policy_cfg.reference_native && bringup == Bringup::Ready && snapshot.enabled))
             && theremin_state.is_none() && chorale_state.is_none() {
             targets[duck_control::model::MOUTH_INDEX] =
                 duck_control::model::mouth_target(scripted_mouth.unwrap_or(snapshot.mouth));
@@ -3081,9 +3081,9 @@ async fn control_loop<T: RobotIo>(
                 write_failures = 0;
                 let unchanged = applied.limits.is_empty();
                 limits.extend(applied.limits);
-                // Published Luwu history is the raw action, including when firmware
+                // Published Reference history is the raw action, including when firmware
                 // travel saturation applied. A successful clamped write still advances it.
-                unchanged || policy_cfg.luwu_native
+                unchanged || policy_cfg.reference_native
             }
             Err(duck_control::io::IoError::BusBusy) => {
                 // Expected half-duplex contention, not a device alarm. The common
@@ -3121,7 +3121,7 @@ async fn control_loop<T: RobotIo>(
                 value["homed"] = serde_json::json!(state.homed.load(Ordering::Relaxed));
                 value["policy_enabled"] = serde_json::json!(intents.enabled());
                 value["supported_m6"] = serde_json::json!(policy_cfg.supported_m6);
-                value["luwu_native"] = serde_json::json!(policy_cfg.luwu_native);
+                value["reference_native"] = serde_json::json!(policy_cfg.reference_native);
             }
             let _ = state.state_tx.send(proto::RobotState {
                 t: state.started.elapsed().as_secs_f64(),

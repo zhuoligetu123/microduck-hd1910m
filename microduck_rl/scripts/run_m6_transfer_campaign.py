@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from run_luwu_p6_training import evaluate, run_training, save
+from run_reference_p6_training import evaluate, run_training, save
 from run_local_head_campaign import wait_for_predecessor
 
 CASES = ['stand', 'forward', 'turn', 'backward', 'turn_right']

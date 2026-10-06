@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
-from run_luwu_p6_training import run_training, select_candidate, save, evaluate
+from run_reference_p6_training import run_training, select_candidate, save, evaluate
 
 
 def predecessor_ready(root):

@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 from mjlab_microduck.tasks.mdp import HdLowSpeedCommand, HdLowSpeedCommandCfg
 
 
@@ -15,10 +15,10 @@ def test_warp_replay_uses_recipe_and_explicit_coherent_feedback_ages():
     import pytest
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
     from replay_hd1910_warp import make_replay_cfg, policy_recipe
-    metadata = {'training_recipe': 'm6_repair_gait_luwu_linear_only_v22_v1',
+    metadata = {'training_recipe': 'm6_repair_gait_reference_linear_only_v22_v1',
                 'command_semantics': 'twist_head_body'}
     variant = policy_recipe(metadata, True)
-    assert variant == 'gait_luwu_linear_only_v22'
+    assert variant == 'gait_reference_linear_only_v22'
     cfg = make_replay_cfg(20, slew=True, bam_reference=True, repair_variant=variant,
                           joint_age_steps=3, imu_age_steps=1)
     terms = cfg.observations['actor'].terms

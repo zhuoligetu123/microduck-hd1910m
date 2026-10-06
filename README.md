@@ -1,6 +1,6 @@
 # MicroDuck HD1910M
 
-Radxa ZERO 3W + 飞特 HD1910M ×15 + BNO08x。包含当前 Luwu 四模型适配、Rust 后端/底层、RL 训练与 MuJoCo 仿真源码；客户端只发布 APK，不包含 App 源码。
+Radxa ZERO 3W + 飞特 HD1910M ×15 + BNO08x。包含行走、拾取、起身、翻滚四模型适配、Rust 后端/底层、RL 训练与 MuJoCo 仿真源码；客户端只发布 APK，不包含 App 源码。
 
 ## 1. 接线
 
@@ -57,6 +57,8 @@ App“使能”→平滑进入 HOME→静止保持；随后再选择行走/任�
 
 ## 5. 演示与 APK
 
+[观看 1080p 技术讲解](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/microduck_explainer.mp4)：8 秒精彩片头、实物接线、舵机编号、零位与 HOME、BAM 说明及新的起身/翻滚仿真。
+
 以下 GIF 可在 README 中直接播放，覆盖完整 180 秒视频，以 **5 倍速、约 36 秒**循环预览；点击动图观看正常速度的完整 MP4。
 
 **App 操作与状态可视化**
@@ -69,9 +71,11 @@ App“使能”→平滑进入 HOME→静止保持；随后再选择行走/任�
 
 [下载 APK](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/microduck.apk) · [App 视频](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/app_preview.mp4) · [MuJoCo 视频](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/mujoco_preview.mp4)
 
-APK 为当前 `com.microduck.control 0.1.1` 内部测试签名包；[ARM64 运行包](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/microduck-hd1910m-arm64.tar.gz)包含编译后的底层、后端、模型与部署脚本。
+APK 为当前 `com.microduck.control 0.1.2` 内部测试签名包；[ARM64 运行包](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/microduck-hd1910m-arm64.tar.gz)包含编译后的底层、后端、模型与部署脚本。此次命名升级需要同时更新配置、底层、后端与 APK；不要混用旧版配置或客户端。
 
-两个视频均为 **1920×1080、30fps、180秒**。这是仿真展示，不是实机验收：方向控制已验证；仍有直行偏航，拾取回稳、起身和翻滚落地未全部成功。嘴部在当前 MuJoCo 中为显示动画，非接触动力学。[视频验证记录](docs/video_validation.json)。
+两个视频均为 **1920×1080、30fps、180秒**。前 112 秒保留方向与头嘴演示；后 68 秒替换为本轮 App 触发的独立仿真：前侧倒地起身后持续双脚站稳；头顶触地翻滚约 367°，随后切回零速度步态动态保持。动作中没有复位或外力辅助。翻滚并非双脚始终同时着地的静态站姿，其他倒地初态未全部通过，不能据此宣称实机或全工况验收。仍有直行偏航，拾取回稳待完善，嘴部仅显示动画。[本轮验证记录](docs/skill_validation.json)。
+
+[起身 App 片段](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/app_getup_verified.mp4) · [起身 MuJoCo 片段](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/mujoco_getup_verified.mp4) · [翻滚 App 片段](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/app_roll_verified.mp4) · [翻滚 MuJoCo 片段](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/mujoco_roll_verified.mp4)
 
 ## 6. 编译、仿真与部署
 
@@ -115,16 +119,16 @@ bash scripts/run_hardware.sh
 
 ## 7. 模型与源码
 
-模型目录：`radxa/references/luwu_runtime_20261005/`。原权重固定于 Luwu 提交 `8cdbbd84710d856581982c9eaf0d5e2970666232`，不混入旧 M6 基线。
+模型目录：`radxa/references/reference_runtime_20261005/`。产品文件名统一为 `hd1910_*.onnx`；图参数、关节顺序、HOME 和 SHA256 保持不变。来源与许可单独保留在 [THIRD_PARTY.md](THIRD_PARTY.md) 和模型清单，不把改名当作重新训练。
 
-本次仓库按私有方式托管，四个基线权重随私有仓库保存；公开发布前请先确认第三方权重的再分发授权。
+权重仅做本地文件名调整，不改变来源或授权。第三方权重的再分发、商用权限需另行确认，详见来源说明；本次不更改仓库可见性。
 
 | 文件 | 用途 | 状态 |
 | --- | --- | --- |
-| `xgoduck_walk.onnx` | 前后行走、侧移、转向、头部控制 | 当前默认行走基线 |
-| `xgoduck_pick.onnx` | 拾取动作及嘴部阶段联动 | 实验功能，非抓取成功保证 |
-| `xgoduck_getup.onnx` | 倒地起身 | 实验功能，需逐姿态验证 |
-| `xgoduck_roulade.onnx` | 翻滚 | 实验功能，落地未稳定 |
+| `hd1910_walk.onnx` | 前后行走、侧移、转向、头部控制 | 当前默认行走基线 |
+| `hd1910_pick.onnx` | 拾取动作及嘴部阶段联动 | 实验功能，非抓取成功保证 |
+| `hd1910_getup.onnx` | 倒地起身 | 前侧初态仿真通过，非全姿态保证 |
+| `hd1910_roulade.onnx` | 头顶触地翻滚 | 本轮仿真完整旋转并动态落地保持 |
 
 嘴部为独立第 15 路，不在 14 维 RL 动作内。此四模型不包含独立坐站、踢腿或踏步权重。
 

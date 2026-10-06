@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 import torch
 from mjlab_microduck.tasks.mdp import hd_head_motion_cost, hd_sole_swing_height
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 
 
 def test_ray_swing_peak_resets_per_environment_without_changing_landing_cost():
@@ -34,7 +34,7 @@ def test_ray_swing_peak_resets_per_environment_without_changing_landing_cost():
     term.peak_heights[:] = .02
     term.reset()
     assert torch.count_nonzero(term.peak_heights) == 0
-    cfg = make_xgo_bam_env_cfg(repair_variant='gait_luwu_linear_only_v22')
+    cfg = make_xgo_bam_env_cfg(repair_variant='gait_reference_linear_only_v22')
     assert cfg.rewards['foot_swing_height'].func is hd_feet_swing_height
 
 

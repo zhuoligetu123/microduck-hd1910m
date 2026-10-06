@@ -10,11 +10,11 @@ import shutil
 import subprocess
 import sys
 
-from run_luwu_p6_training import run_training, save
+from run_reference_p6_training import run_training, save
 from review_stable_gait import stability_metrics
 
 ROOT = Path(__file__).resolve().parents[1]
-RECIPE = 'gait_luwu_curriculum_scaled_v21'
+RECIPE = 'gait_reference_curriculum_scaled_v21'
 BASELINE_SHA = 'fc8b790539e22b175dce9ae41146bd253ca90d00934f64b50d9e0397f8ae2f7f'
 
 
@@ -46,7 +46,7 @@ def prepare(root):
     save(root/'installation.json', dict(calibration_verified=False,
         joints=[{k:j[k] for k in ('name', 'id', 'direction', 'zero_ticks')} for j in reference['joints']]))
     shutil.copy2(reference_path, root/'static_reference.json')
-    parent = ROOT/'training_runs/luwu_smoothing_ab_20261004/B/runs'/RECIPE/'logs/rsl_rl/microduck_hd1910_xgobam_p6'
+    parent = ROOT/'training_runs/reference_smoothing_ab_20261004/B/runs'/RECIPE/'logs/rsl_rl/microduck_hd1910_xgobam_p6'
     checkpoints = list(parent.glob('*/model_650.pt'))
     if len(checkpoints) != 1:
         raise ValueError('expected smoothing/B checkpoint 650')

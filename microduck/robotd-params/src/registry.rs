@@ -119,7 +119,7 @@ pub const REGISTRY: &[Entry] = &[
         "Consecutive bus read failures before reporting unhealthy",
     ),
     // ── [policy] ─────────────────────────────────────────────────────────────
-    entry("policy.luwu_native", Kind::Bool, "Pinned Luwu raw-action four-policy runtime"),
+    entry("policy.reference_native", Kind::Bool, "Pinned Reference raw-action four-policy runtime"),
     entry("policy.supported_m6", Kind::Bool, "Explicit operator-supported HD1910 M6 trial (not production qualification)"),
     feature(
         "policy.enabled",

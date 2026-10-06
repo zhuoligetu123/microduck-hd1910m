@@ -6,7 +6,7 @@ import hashlib
 from pathlib import Path
 import torch
 from mjlab_microduck.actuator.friction_dr_bam import FrictionDRBamActuator, FrictionDRBamActuatorCfg
-from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH, KP_FW, TASK_ID
+from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH, KP_FW, TASK_ID
 
 SITSTAND_TASK_ID = 'Mjlab-SitStand-Flat-MicroDuck-XgoBam-P6'
 ROULADE_TASK_ID = 'Mjlab-Roulade-Flat-MicroDuck-XgoBam-P6'
@@ -334,33 +334,33 @@ class XgoBamActuatorCfg(FrictionDRBamActuatorCfg):
 
 def make_xgo_bam_env_cfg(play=False, motion_refine=False, locomotion_refine=False, transfer_refine=False,
                          repair_variant=None):
-    if repair_variant == 'gait_luwu_curriculum_v20':
+    if repair_variant == 'gait_reference_curriculum_v20':
         from copy import deepcopy
         from .microduck_velocity_env_cfg import make_microduck_velocity_env_cfg
-        cfg = make_xgo_bam_env_cfg(play=play, repair_variant='gait_luwu_recipe_v18')
+        cfg = make_xgo_bam_env_cfg(play=play, repair_variant='gait_reference_recipe_v18')
         upstream = make_microduck_velocity_env_cfg()
         curriculum = deepcopy(upstream.curriculum['standing_envs'])
         cfg.commands['twist'].rel_standing_envs = curriculum.params['standing_stages'][0]['rel_standing_envs']
         if not play:
             cfg.curriculum['standing_envs'] = curriculum
         return cfg
-    if repair_variant in ('gait_luwu_scaled_v19', 'gait_luwu_curriculum_scaled_v21',
-                          'gait_luwu_linear_only_v22'):
+    if repair_variant in ('gait_reference_scaled_v19', 'gait_reference_curriculum_scaled_v21',
+                          'gait_reference_linear_only_v22'):
         from .microduck_velocity_env_cfg import make_microduck_velocity_env_cfg
-        base = ('gait_luwu_recipe_v18' if repair_variant == 'gait_luwu_scaled_v19'
-                else 'gait_luwu_curriculum_v20')
+        base = ('gait_reference_recipe_v18' if repair_variant == 'gait_reference_scaled_v19'
+                else 'gait_reference_curriculum_v20')
         cfg = make_xgo_bam_env_cfg(play=play, repair_variant=base)
         upstream = make_microduck_velocity_env_cfg(play=play)
         for reward, axis in (('track_linear_velocity', 'lin_vel_x'),
                              ('track_angular_velocity', 'ang_vel_z')):
-            if repair_variant == 'gait_luwu_linear_only_v22' and axis == 'ang_vel_z':
+            if repair_variant == 'gait_reference_linear_only_v22' and axis == 'ang_vel_z':
                 continue
             source_range = getattr(upstream.commands['twist'].ranges, axis)
             target_range = getattr(cfg.commands['twist'].ranges, axis)
             ratio = max(abs(v) for v in target_range) / max(abs(v) for v in source_range)
             cfg.rewards[reward].params['std'] *= ratio
         return cfg
-    if repair_variant == 'gait_luwu_recipe_v18':
+    if repair_variant == 'gait_reference_recipe_v18':
         from copy import deepcopy
         # Isolate reward changes: retain measured payload, age and action contract.
         cfg = make_xgo_bam_env_cfg(play=play, repair_variant='gait_payload_v8')
@@ -977,36 +977,36 @@ def register_task(installation_path=None, motion_refine=False, locomotion_refine
     if voltage_domain is not None:
         configure_voltage_domain(train_cfg, voltage_domain)
     if head_bias_course is not None:
-        if repair_variant not in ('gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
-            raise ValueError('head bias ablation requires the paired Luwu curriculum recipes')
+        if repair_variant not in ('gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
+            raise ValueError('head bias ablation requires the paired Reference curriculum recipes')
         configure_head_bias_course(train_cfg, head_bias_course)
     if action_rate_weight is not None:
-        if repair_variant not in ('gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
-            raise ValueError('action rate ablation requires the paired Luwu curriculum recipes')
+        if repair_variant not in ('gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
+            raise ValueError('action rate ablation requires the paired Reference curriculum recipes')
         configure_action_rate_weight(train_cfg, action_rate_weight)
     if tracking_axes is not None:
-        if repair_variant not in ('gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
-            raise ValueError('tracking axes ablation requires paired Luwu curriculum recipes')
+        if repair_variant not in ('gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
+            raise ValueError('tracking axes ablation requires paired Reference curriculum recipes')
         configure_tracking_axes(train_cfg, tracking_axes)
     if swing_reference is not None:
-        if repair_variant not in ('gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
-            raise ValueError('swing reference ablation requires paired Luwu curriculum recipes')
+        if repair_variant not in ('gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
+            raise ValueError('swing reference ablation requires paired Reference curriculum recipes')
         configure_swing_reference(train_cfg, swing_reference)
     if standing_fraction is not None:
         configure_standing_fraction(train_cfg, standing_fraction)
     if mirror_loss_weight is not None:
-        if repair_variant not in ('gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
-            raise ValueError('mirror loss ablation requires the Luwu gait recipes')
+        if repair_variant not in ('gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
+            raise ValueError('mirror loss ablation requires the Reference gait recipes')
         mirror_loss_config(mirror_loss_weight)
     if tracking_mean_seconds is not None:
-        if repair_variant not in ('gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
-            raise ValueError('tracking mean ablation requires the Luwu gait recipes')
+        if repair_variant not in ('gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
+            raise ValueError('tracking mean ablation requires the Reference gait recipes')
         configure_tracking_mean(train_cfg, tracking_mean_seconds)
     if straight_yaw_std is not None:
         configure_straight_yaw(train_cfg, straight_yaw_std)
     if airtime_height_gate is not None:
-        if repair_variant not in ('gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
-            raise ValueError('airtime height ablation requires the Luwu gait recipes')
+        if repair_variant not in ('gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
+            raise ValueError('airtime height ablation requires the Reference gait recipes')
         configure_airtime_height_gate(train_cfg, airtime_height_gate)
     if feedback_age_max_steps is not None:
         configure_feedback_age(train_cfg, feedback_age_max_steps)
@@ -1077,7 +1077,7 @@ def register_task(installation_path=None, motion_refine=False, locomotion_refine
             metadata.update(task_id=task_id, hardware_profile='HD1910-XgoBam-reference',
                 calibration_sha256=hashlib.sha256(PROFILE_PATH.read_bytes()).hexdigest(),
                 calibration_status='external_reference_unvalidated', deployment_ready='false',
-                actuator_backend='xgoduck_bam_m6', kp_fw=str(KP_FW),
+                actuator_backend='hd1910_bam_m6', kp_fw=str(KP_FW),
                 policy_role=('step' if repair_variant in ('step', 'step_balanced', 'step_right_lift', 'step_anchored', 'step_mild_right', 'step_hold_robust', 'step_delay_curriculum', 'step_joint_age', 'step_age_drift', 'step_lift35_age', 'step_lift35', 'step_coherent_age') else
                              'roulade' if repair_variant == 'roulade' else
                              'sitstand' if repair_variant == 'sitstand' else
@@ -1095,12 +1095,12 @@ def register_task(installation_path=None, motion_refine=False, locomotion_refine
                                  'm6_transfer_refine_v1' if transfer_refine else
                                  'm6_locomotion_refine_v1' if locomotion_refine else
                                  'm6_motion_refine_v1' if motion_refine else 'm6_reference_v1'))
-            if repair_variant in ('gait_coherent_age', 'step_coherent_age', 'gait_head_commands', 'gait_head_balance', 'gait_head_follow_v2', 'gait_head_stride_v2', 'gait_head_force_v3', 'gait_head_force_sole_v3', 'gait_head_dc_v4', 'gait_head_dc_stride_v4', 'gait_head_lift_v5', 'gait_timing_v6', 'gait_forward_balance_v6', 'gait_forward_tail_v7', 'gait_payload_v8', 'gait_sole_support_v9', 'gait_sole_demand_v10', 'gait_bilateral_v11', 'gait_bilateral_mirror_v12', 'gait_bilateral_lift_v13', 'gait_bilateral_stage20_v14', 'gait_cycle_yaw_v15', 'gait_lift_release_v16', 'gait_weak_quality_v17', 'gait_luwu_recipe_v18', 'gait_luwu_scaled_v19', 'gait_luwu_curriculum_v20', 'gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
+            if repair_variant in ('gait_coherent_age', 'step_coherent_age', 'gait_head_commands', 'gait_head_balance', 'gait_head_follow_v2', 'gait_head_stride_v2', 'gait_head_force_v3', 'gait_head_force_sole_v3', 'gait_head_dc_v4', 'gait_head_dc_stride_v4', 'gait_head_lift_v5', 'gait_timing_v6', 'gait_forward_balance_v6', 'gait_forward_tail_v7', 'gait_payload_v8', 'gait_sole_support_v9', 'gait_sole_demand_v10', 'gait_bilateral_v11', 'gait_bilateral_mirror_v12', 'gait_bilateral_lift_v13', 'gait_bilateral_stage20_v14', 'gait_cycle_yaw_v15', 'gait_lift_release_v16', 'gait_weak_quality_v17', 'gait_reference_recipe_v18', 'gait_reference_scaled_v19', 'gait_reference_curriculum_v20', 'gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
                 metadata['observation_names'] = (
                     'base_ang_vel,projected_gravity,joint_pos,joint_vel,'
                     'actions,command,head_command,body_command')
                 metadata['joint_snapshot_training'] = 'coherent_pos_vel_delay_v1'
-            if repair_variant in ('gait_payload_v8', 'gait_sole_support_v9', 'gait_sole_demand_v10', 'gait_bilateral_v11', 'gait_bilateral_mirror_v12', 'gait_bilateral_lift_v13', 'gait_bilateral_stage20_v14', 'gait_cycle_yaw_v15', 'gait_lift_release_v16', 'gait_weak_quality_v17', 'gait_luwu_recipe_v18', 'gait_luwu_scaled_v19', 'gait_luwu_curriculum_v20', 'gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'):
+            if repair_variant in ('gait_payload_v8', 'gait_sole_support_v9', 'gait_sole_demand_v10', 'gait_bilateral_v11', 'gait_bilateral_mirror_v12', 'gait_bilateral_lift_v13', 'gait_bilateral_stage20_v14', 'gait_cycle_yaw_v15', 'gait_lift_release_v16', 'gait_weak_quality_v17', 'gait_reference_recipe_v18', 'gait_reference_scaled_v19', 'gait_reference_curriculum_v20', 'gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'):
                 from mjlab_microduck.actuator.payload_uncertainty import mass_contract
                 payload = mass_contract()
                 metadata['mass_profile_sha256'] = payload['profile_sha256']

@@ -1,4 +1,4 @@
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 
 
 def test_lateral_quiet_preserves_gait_and_only_adds_targeted_cost():

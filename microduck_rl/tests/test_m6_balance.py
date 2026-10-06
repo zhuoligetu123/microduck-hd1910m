@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 import pytest
 from mjlab_microduck.tasks.mdp import hd_trunk_balance_cost
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 
 sys.path.insert(0, str(Path(__file__).parents[1]/'scripts'))
 from replay_hd1910 import posture_metrics, load_replay_model

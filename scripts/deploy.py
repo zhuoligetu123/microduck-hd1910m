@@ -24,7 +24,7 @@ def main():
     if not (ROOT / 'out/arm64/bin/robotd').is_file():
         parser.error('Run bash scripts/build.sh arm64 first')
     for role in ('walk', 'getup', 'pick', 'roulade'):
-        if not (ROOT / f'radxa/references/luwu_runtime_20261005/xgoduck_{role}.onnx').is_file():
+        if not (ROOT / f'radxa/references/reference_runtime_20261005/hd1910_{role}.onnx').is_file():
             parser.error('Run scripts/fetch_models.py first')
     host = f'{args.user}@{args.ip}'
     # rsync prompts for SSH credentials; no password is saved or embedded.

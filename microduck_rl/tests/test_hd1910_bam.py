@@ -9,8 +9,8 @@ import pytest
 import torch
 import mjlab
 import mujoco
-from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH, XgoBamCpuController
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg, XgoBamActuator
+from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH, XgoBamCpuController
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg, XgoBamActuator
 from mjlab_microduck.actuator.friction_dr_bam import FrictionDRBamActuator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,13 +18,13 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from replay_hd1910 import load_replay_model, validate_metadata
 
 
-def test_luwu_runtime_p6_selection_in_fresh_process():
+def test_reference_runtime_p6_selection_in_fresh_process():
     import os
     import subprocess
     subprocess.run([sys.executable, '-c', '''
 import mjlab
-from mjlab_microduck.actuator.cpu_xgoduck_bam import KP_FW, TASK_ID
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.actuator.cpu_hd1910_bam import KP_FW, TASK_ID
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 assert KP_FW == 6 and TASK_ID.endswith('-P6-Slew')
 assert make_xgo_bam_env_cfg().scene.entities['robot'].articulation.actuators[0].kp_fw == 6
 '''], env={**os.environ, 'MICRODUCK_BAM_KP':'6'}, check=True)

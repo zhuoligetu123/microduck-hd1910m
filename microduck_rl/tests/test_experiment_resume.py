@@ -14,7 +14,7 @@ from mjlab_microduck.tasks import MicroduckOnPolicyRunner, VelocityOnPolicyRunne
 def test_resume_stages_original_completed_iteration(tmp_path):
     (tmp_path/'parent').mkdir()
     torch.save({'iter': 199}, tmp_path/'parent/model.pt')
-    args, start = training_start(tmp_path, 'gait_luwu_linear_only_v22', True)
+    args, start = training_start(tmp_path, 'gait_reference_linear_only_v22', True)
     assert start == 200
     assert '--warm-start-checkpoint' not in args
     assert args[-2:] == ['--resume-checkpoint', str(tmp_path/'parent/model_199.pt')]
@@ -22,7 +22,7 @@ def test_resume_stages_original_completed_iteration(tmp_path):
 
 
 def test_warm_start_is_still_explicit(tmp_path):
-    args, start = training_start(tmp_path, 'gait_luwu_linear_only_v22')
+    args, start = training_start(tmp_path, 'gait_reference_linear_only_v22')
     assert start == 0
     assert '--warm-start-checkpoint' in args and '--resume-checkpoint' not in args
 

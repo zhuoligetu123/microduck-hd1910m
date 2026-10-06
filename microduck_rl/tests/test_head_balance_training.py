@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import torch
 
 from mjlab_microduck.tasks.mdp import hd_head_gaze_envelope_cost
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 
 
 def gaze_cost(pitch, neck=0., head=0., tilt=0.):
@@ -67,7 +67,7 @@ def test_recipe_covers_head_commands_without_changing_action_contract():
 def test_snapshot_export_restores_names_without_changing_graph(tmp_path):
     import onnx
     from onnx import TensorProto, helper
-    from mjlab_microduck.tasks.xgoduck_bam import restore_joint_snapshot_metadata
+    from mjlab_microduck.tasks.hd1910_bam import restore_joint_snapshot_metadata
     graph = helper.make_graph([helper.make_node('Identity', ['obs'], ['out'])], 'test',
         [helper.make_tensor_value_info('obs', TensorProto.FLOAT, [1, 61])],
         [helper.make_tensor_value_info('out', TensorProto.FLOAT, [1, 61])])

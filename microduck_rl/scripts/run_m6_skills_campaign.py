@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 import subprocess
 import sys
-from run_luwu_p6_training import run_training, save
+from run_reference_p6_training import run_training, save
 
 QUEUES = {'gait': [('head_lateral_quiet', 8192, 500), ('step', 8192, 1200)],
           'posture': [('sitstand', 2048, 800)],

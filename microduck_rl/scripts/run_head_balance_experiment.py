@@ -14,7 +14,7 @@ import statistics
 import subprocess
 import sys
 
-from run_luwu_p6_training import run_training, save
+from run_reference_p6_training import run_training, save
 
 SOURCE = Path(__file__).resolve().parents[1]
 
@@ -131,7 +131,7 @@ def main():
     p.add_argument('--phase', choices=('prepare', 'train', 'evaluate', 'stress', 'summarize', 'compare'), required=True)
     p.add_argument('--parent', type=Path)
     p.add_argument('--parent-policy', type=Path, help='Export matching the selected checkpoint, not necessarily the final export')
-    p.add_argument('--variant', choices=('gait_head_commands', 'gait_head_balance', 'gait_head_follow_v2', 'gait_head_stride_v2', 'gait_head_force_v3', 'gait_head_force_sole_v3', 'gait_head_dc_v4', 'gait_head_dc_stride_v4', 'gait_head_lift_v5', 'gait_timing_v6', 'gait_forward_balance_v6', 'gait_forward_tail_v7', 'gait_payload_v8', 'gait_sole_support_v9', 'gait_sole_demand_v10', 'gait_bilateral_v11', 'gait_bilateral_mirror_v12', 'gait_bilateral_lift_v13', 'gait_bilateral_stage20_v14', 'gait_cycle_yaw_v15', 'gait_lift_release_v16', 'gait_weak_quality_v17', 'gait_luwu_recipe_v18', 'gait_luwu_scaled_v19', 'gait_luwu_curriculum_v20', 'gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'))
+    p.add_argument('--variant', choices=('gait_head_commands', 'gait_head_balance', 'gait_head_follow_v2', 'gait_head_stride_v2', 'gait_head_force_v3', 'gait_head_force_sole_v3', 'gait_head_dc_v4', 'gait_head_dc_stride_v4', 'gait_head_lift_v5', 'gait_timing_v6', 'gait_forward_balance_v6', 'gait_forward_tail_v7', 'gait_payload_v8', 'gait_sole_support_v9', 'gait_sole_demand_v10', 'gait_bilateral_v11', 'gait_bilateral_mirror_v12', 'gait_bilateral_lift_v13', 'gait_bilateral_stage20_v14', 'gait_cycle_yaw_v15', 'gait_lift_release_v16', 'gait_weak_quality_v17', 'gait_reference_recipe_v18', 'gait_reference_scaled_v19', 'gait_reference_curriculum_v20', 'gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'))
     p.add_argument('--learning-rate', type=float, default=None)
     p.add_argument('--desired-kl', type=float, default=None)
     p.add_argument('--policy', type=Path)
@@ -264,7 +264,7 @@ def main():
         if len(policies) != 1:
             raise RuntimeError('missing/ambiguous export')
         policy = policies[0]
-        from mjlab_microduck.tasks.xgoduck_bam import restore_joint_snapshot_metadata
+        from mjlab_microduck.tasks.hd1910_bam import restore_joint_snapshot_metadata
         restore_joint_snapshot_metadata(policy)
         subprocess.run([sys.executable, str(root/'source/scripts/audit_bounded_policy.py'),
                         '--policy', str(policy), '--checkpoint', str(policy.parent/f'model_{final_iteration}.pt'),
@@ -323,7 +323,7 @@ def main():
              selected_candidate=str(policy), policy_sha256=parity['policy_sha256'],
              selection='local stability candidate, not automatic deployment',
              source_files_sha256={str(p.relative_to(SOURCE)):hashlib.sha256(p.read_bytes()).hexdigest()
-                 for p in (SOURCE/'src/mjlab_microduck/tasks/xgoduck_bam.py',
+                 for p in (SOURCE/'src/mjlab_microduck/tasks/hd1910_bam.py',
                            SOURCE/'src/mjlab_microduck/tasks/mdp.py',
                            SOURCE/'scripts/replay_hd1910.py')},
              remaining=['head command tracking', 'turning underspeed', 'sole clearance below 25mm'],

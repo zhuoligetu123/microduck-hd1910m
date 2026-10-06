@@ -1,0 +1,35 @@
+{
+  "recovery": {
+    "success": true,
+    "stable_last_5s": true,
+    "stationary_two_feet": true,
+    "dynamic_foot_support": true,
+    "no_support": true,
+    "rotation_deg": 99.6161560646521,
+    "head_top_contact": true,
+    "final_tilt": 0.8172070366810142,
+    "final_z": 0.1161106077956786,
+    "tail_max_tilt": 0.9015207514152421,
+    "tail_min_z": 0.11599735547240947,
+    "tail_support_fraction": 1.0,
+    "stable_foot_fraction": 1.0
+  },
+  "roulade": {
+    "success": true,
+    "stable_last_5s": true,
+    "stationary_two_feet": false,
+    "dynamic_foot_support": true,
+    "no_support": true,
+    "rotation_deg": 366.94581150192005,
+    "head_top_contact": true,
+    "final_tilt": 9.238157640559294,
+    "final_z": 0.1159767195228399,
+    "tail_max_tilt": 11.27981212644615,
+    "tail_min_z": 0.11032869043960511,
+    "tail_support_fraction": 1.0,
+    "stable_foot_fraction": 0.176
+  },
+  "hardware": false,
+  "scope": "Single local simulation; explicit initial scene setup, no reset during either skill.",
+  "commands_accepted": true
+}

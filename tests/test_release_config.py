@@ -17,7 +17,7 @@ class ReleaseConfigTest(unittest.TestCase):
             result = configure(Path(folder), port='/dev/example-servo')
             io = json.loads((result / 'feetech.json').read_text())
             self.assertFalse(io['allow_motion'])
-            self.assertTrue(io['luwu_native'])
+            self.assertTrue(io['reference_native'])
             self.assertTrue(io['scheduled_bus'])
             self.assertEqual(io['port'], '/dev/example-servo')
             self.assertEqual(Path(io['installation']), path)

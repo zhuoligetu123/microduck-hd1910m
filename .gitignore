@@ -12,7 +12,7 @@
 **/*.mp4
 **/*.apk
 **/*.onnx
-!/radxa/references/luwu_runtime_20261005/*.onnx
+!/radxa/references/reference_runtime_20261005/*.onnx
 **/*.pt
 **/*.ckpt
 **/*.key

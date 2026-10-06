@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from run_luwu_p6_training import evaluate, run_training, save, select_candidate
+from run_reference_p6_training import evaluate, run_training, save, select_candidate
 
 
 def main():

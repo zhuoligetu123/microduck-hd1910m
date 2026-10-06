@@ -5,7 +5,7 @@ import pytest
 import torch
 from test_hd1910_bounded import term
 from mjlab_microduck.tasks.mdp import hd_action_reversal_cost
-from mjlab_microduck.tasks.xgoduck_bam import make_xgo_bam_env_cfg
+from mjlab_microduck.tasks.hd1910_bam import make_xgo_bam_env_cfg
 
 sys.path.insert(0, str(Path(__file__).parents[1]/'scripts'))
 from run_m6_repair_campaign import assessment

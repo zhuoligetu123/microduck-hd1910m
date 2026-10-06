@@ -377,7 +377,7 @@ impl Controller {
         if !self.policy.has_ground_pick() {
             return Err("no ground-pick policy loaded");
         }
-        if self.ground_pick.is_some() || (self.policy.is_luwu() && self.active.is_some()) {
+        if self.ground_pick.is_some() || (self.policy.is_reference() && self.active.is_some()) {
             return Err("ground pick already running");
         }
         self.ground_pick = Some(0.0);
@@ -432,7 +432,7 @@ impl Controller {
     }
 
     pub fn cancel_manual_step(&mut self) {
-        if self.policy.is_luwu() {
+        if self.policy.is_reference() {
             if !self.busy() { return; }
             self.active = None;
             self.ground_pick = None;
@@ -496,8 +496,8 @@ impl Controller {
         dt: f64,
         scale_mult: f64,
     ) -> Result<Step, PolicyError> {
-        let luwu = self.policy.is_luwu();
-        if luwu {
+        let reference = self.policy.is_reference();
+        if reference {
             validate_hd_tuning(&self.tuning, scale_mult)?;
             if let Some(active) = self.active.as_mut() {
                 if active.index == 0 {
@@ -624,7 +624,7 @@ impl Controller {
         };
 
         let home = self.policy.home(net);
-        if luwu {
+        if reference {
             effective.body = Default::default();
             if self.last_net != Some(net) || self.previous.is_none() {
                 self.last_action = [0.0; ACTION_LEN];
@@ -648,7 +648,7 @@ impl Controller {
             &effective,
         );
 
-        let recovery_prelude = luwu && self.active.is_some_and(|a| a.index == 0
+        let recovery_prelude = reference && self.active.is_some_and(|a| a.index == 0
             && self.skills.skills[0].duration - a.remaining < 1.0 - 1e-9);
         let action = if recovery_prelude { [0.0; ACTION_LEN] } else { self.policy.infer(&observation, net)? };
         self.last_action = action;
@@ -711,7 +711,7 @@ impl Controller {
         }
 
         if let Some(previous) = self.previous {
-            if luwu {
+            if reference {
                 let old = if net == Net::Skill(1) { 0.15 } else { 0.45 };
                 for joint in 0..NUM_JOINTS { targets[joint] = old * previous[joint] + (1.0-old) * targets[joint]; }
             } else if let Some(alpha) = self.tuning.head_lowpass {
@@ -719,7 +719,7 @@ impl Controller {
                     targets[joint] = alpha * targets[joint] + (1.0 - alpha) * previous[joint];
                 }
             }
-            if let Some(alpha) = self.tuning.legs_lowpass.filter(|_| !luwu) {
+            if let Some(alpha) = self.tuning.legs_lowpass.filter(|_| !reference) {
                 for (joint, target) in targets.iter_mut().enumerate() {
                     if HEAD_JOINTS.contains(&joint) || joint == duck_control::model::MOUTH_INDEX {
                         continue;
@@ -729,7 +729,7 @@ impl Controller {
             }
         }
         self.previous = Some(targets);
-        let scripted_mouth = if luwu { self.ground_pick.map(|phase| if phase < 0.4 { 1.0 } else { 0.0 }) } else { None };
+        let scripted_mouth = if reference { self.ground_pick.map(|phase| if phase < 0.4 { 1.0 } else { 0.0 }) } else { None };
 
         // Advance the windows, after the tick that used them — the prototype advances its
         // phase after the motor write.
@@ -764,16 +764,16 @@ mod tests {
     use super::*;
 
     #[test]
-    #[ignore = "requires pinned Luwu graphs and ORT_DYLIB_PATH; no hardware"]
-    fn luwu_four_graph_contract_and_scheduler() {
-        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../radxa/references/luwu_runtime_20261005");
+    #[ignore = "requires pinned Reference graphs and ORT_DYLIB_PATH; no hardware"]
+    fn reference_four_graph_contract_and_scheduler() {
+        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../radxa/references/reference_runtime_20261005");
         let paths = duck_control::policy::PolicyPaths {
-            walk: root.join("xgoduck_walk.onnx"), ground_pick: Some(root.join("xgoduck_pick.onnx")),
-            skills: vec![root.join("xgoduck_getup.onnx"),root.join("xgoduck_roulade.onnx")], ..Default::default()
+            walk: root.join("hd1910_walk.onnx"), ground_pick: Some(root.join("hd1910_pick.onnx")),
+            skills: vec![root.join("hd1910_getup.onnx"),root.join("hd1910_roulade.onnx")], ..Default::default()
         };
-        let policy = Policy::load_luwu(&paths).unwrap();
+        let policy = Policy::load_reference(&paths).unwrap();
         let mut wrong = paths.clone(); wrong.skills.swap(0,1);
-        assert!(Policy::load_luwu(&wrong).is_err());
+        assert!(Policy::load_reference(&wrong).is_err());
         let tuning = Tuning {action_scale:1.,standing_action_scale:1.,standing_gain_ratio:1.,gain:200,
             head_lowpass:None,legs_lowpass:None};
         let skills = SkillTuning {ground_pick_period:4.,ground_pick_end_phase:1.,skills:vec![
@@ -831,7 +831,7 @@ mod tests {
         }
         assert!(timed_out);
         c.cancel_manual_step();assert!(!c.busy());
-        if let Ok(path)=std::env::var("LUWU_PARITY_REPORT") {
+        if let Ok(path)=std::env::var("REFERENCE_PARITY_REPORT") {
             std::fs::write(path,serde_json::to_vec(&samples).unwrap()).unwrap();
         }
     }

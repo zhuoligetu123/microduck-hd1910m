@@ -19,7 +19,7 @@ def capture(tmp_path, change=None):
                        torque_enabled=1, current_a=.1, voltage_v=6.6) for k in range(15)]
         row = dict(t=i*.1, policy='held', targets=[0.]*15, feedback=dict(
             sequence=i, policy_enabled=False, homed=True, control_valid=True,
-            imu_valid=True, error=None, servo_gains_verified=True, servo_gain_profile='luwu_runtime',
+            imu_valid=True, error=None, servo_gains_verified=True, servo_gain_profile='reference_runtime',
             joint_age_s=.02, imu_age_s=.01, joints=joints, states=states,
             positions=[calibration.RAD_PER_TICK]*15,
             imu=dict(gravity=[0, 0, -1], gyro=[0, 0, 0])))

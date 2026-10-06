@@ -4,7 +4,7 @@ import unittest
 
 
 spec = importlib.util.spec_from_file_location('campaign',
-    Path(__file__).parents[1] / 'scripts/run_luwu_p6_training.py')
+    Path(__file__).parents[1] / 'scripts/run_reference_p6_training.py')
 campaign = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(campaign)
 

@@ -13,7 +13,7 @@ import shutil
 import subprocess
 import sys
 import mjlab
-from mjlab_microduck.tasks.xgoduck_bam import register_task, TASK_ID, SITSTAND_TASK_ID, ROULADE_TASK_ID, STEP_TASK_ID
+from mjlab_microduck.tasks.hd1910_bam import register_task, TASK_ID, SITSTAND_TASK_ID, ROULADE_TASK_ID, STEP_TASK_ID
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(add_help=False)
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     parser.add_argument('--transfer-refine', action='store_true',
                         help='Gradual smoothing and DC head/yaw repair for gait transfer')
     parser.add_argument('--repair-variant', choices=('head_lateral_quiet', 'gait_delivery', 'gait_yaw_only', 'gait_yaw_hold', 'gait_yaw_hold_head', 'gait_joint_age', 'gait_age_only', 'gait_age_mixed', 'gait_joint_age_stress', 'gait_coherent_age', 'gait_head_limit', 'step', 'step_balanced', 'step_right_lift', 'step_anchored', 'step_mild_right', 'step_hold_robust', 'step_delay_curriculum', 'step_joint_age', 'step_age_drift', 'step_lift35_age', 'step_lift35', 'step_coherent_age', 'pitch_retention', 'pitch_retention_delay', 'head_balance', 'delay_robust', 'control', 'reversal', 'yaw', 'balance', 'balance_lift',
-                                                   'lift_focus', 'lift_robust', 'pitch_robust', 'pitch_body', 'head_quiet', 'head_sole', 'head_lift_progress', 'head_lateral', 'head_omni', 'head_lower', 'head_lower_joint', 'recovery', 'recovery_support', 'recovery_all', 'sitstand', 'roulade', 'gait_head_commands', 'gait_head_balance', 'gait_head_follow_v2', 'gait_head_stride_v2', 'gait_head_force_v3', 'gait_head_force_sole_v3', 'gait_head_dc_v4', 'gait_head_dc_stride_v4', 'gait_head_lift_v5', 'gait_timing_v6', 'gait_forward_balance_v6', 'gait_forward_tail_v7', 'gait_payload_v8', 'gait_sole_support_v9', 'gait_sole_demand_v10', 'gait_bilateral_v11', 'gait_bilateral_mirror_v12', 'gait_bilateral_lift_v13', 'gait_bilateral_stage20_v14', 'gait_cycle_yaw_v15', 'gait_lift_release_v16', 'gait_weak_quality_v17', 'gait_luwu_recipe_v18', 'gait_luwu_scaled_v19', 'gait_luwu_curriculum_v20', 'gait_luwu_curriculum_scaled_v21', 'gait_luwu_linear_only_v22'),
+                                                   'lift_focus', 'lift_robust', 'pitch_robust', 'pitch_body', 'head_quiet', 'head_sole', 'head_lift_progress', 'head_lateral', 'head_omni', 'head_lower', 'head_lower_joint', 'recovery', 'recovery_support', 'recovery_all', 'sitstand', 'roulade', 'gait_head_commands', 'gait_head_balance', 'gait_head_follow_v2', 'gait_head_stride_v2', 'gait_head_force_v3', 'gait_head_force_sole_v3', 'gait_head_dc_v4', 'gait_head_dc_stride_v4', 'gait_head_lift_v5', 'gait_timing_v6', 'gait_forward_balance_v6', 'gait_forward_tail_v7', 'gait_payload_v8', 'gait_sole_support_v9', 'gait_sole_demand_v10', 'gait_bilateral_v11', 'gait_bilateral_mirror_v12', 'gait_bilateral_lift_v13', 'gait_bilateral_stage20_v14', 'gait_cycle_yaw_v15', 'gait_lift_release_v16', 'gait_weak_quality_v17', 'gait_reference_recipe_v18', 'gait_reference_scaled_v19', 'gait_reference_curriculum_v20', 'gait_reference_curriculum_scaled_v21', 'gait_reference_linear_only_v22'),
                         help='Fixed-budget M6 B-parent ablations; no runtime changes')
     parser.add_argument('--installation', type=Path,
                         help='Read-only native joint-zero snapshot; never writes hardware')
@@ -80,10 +80,10 @@ if __name__ == '__main__':
         checkpoint = args.warm_start_checkpoint.resolve(strict=True)
         if args.warm_start_policy:
             import onnx
-            from mjlab_microduck.actuator.cpu_xgoduck_bam import PROFILE_PATH, KP_FW
+            from mjlab_microduck.actuator.cpu_hd1910_bam import PROFILE_PATH, KP_FW
             provenance = {x.key:x.value for x in onnx.load(args.warm_start_policy).metadata_props}
             required = dict(task_id=STEP_TASK_ID if args.repair_variant in ('step_balanced', 'step_right_lift', 'step_anchored', 'step_mild_right', 'step_hold_robust', 'step_delay_curriculum', 'step_joint_age', 'step_age_drift', 'step_lift35_age', 'step_lift35', 'step_coherent_age') else TASK_ID,
-                actuator_backend='xgoduck_bam_m6', kp_fw=str(KP_FW),
+                actuator_backend='hd1910_bam_m6', kp_fw=str(KP_FW),
                 calibration_sha256=hashlib.sha256(PROFILE_PATH.read_bytes()).hexdigest(),
                 action_semantics='bounded_slew_home_delta_v2',
                 previous_action_semantics='bounded_slew_home_delta_v2')
@@ -94,7 +94,7 @@ if __name__ == '__main__':
             if provenance.get('task_id') != 'Mjlab-Velocity-Flat-MicroDuck-HD1910-Reference-Slew-Refine':
                 parser.error('warm start requires the existing velocity v2 reference contract')
         digest = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
-        from mjlab_microduck.actuator.cpu_xgoduck_bam import KP_FW
+        from mjlab_microduck.actuator.cpu_hd1910_bam import KP_FW
         experiment = 'microduck_hd1910_xgobam' + ('_p6' if KP_FW == 6 else '')
         target = Path('logs/rsl_rl') / experiment / ('parent_' + digest[:12])
         target.mkdir(parents=True, exist_ok=True)
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     if args.resume_checkpoint:
         import onnx
         import torch
-        from mjlab_microduck.actuator.cpu_xgoduck_bam import KP_FW, PROFILE_PATH
+        from mjlab_microduck.actuator.cpu_hd1910_bam import KP_FW, PROFILE_PATH
         checkpoint = args.resume_checkpoint.resolve(strict=True)
         policies = list(checkpoint.parent.glob('*.onnx'))
         if len(policies) != 1:
@@ -187,7 +187,7 @@ if __name__ == '__main__':
                            ('tracking_mean_seconds', args.tracking_mean_seconds)):
             if key in metadata and value is None:
                 parser.error(f'{key} parent requires an explicit matching curriculum choice')
-        required = dict(task_id=task_id, kp_fw=str(KP_FW), actuator_backend='xgoduck_bam_m6',
+        required = dict(task_id=task_id, kp_fw=str(KP_FW), actuator_backend='hd1910_bam_m6',
                         calibration_sha256=hashlib.sha256(PROFILE_PATH.read_bytes()).hexdigest(),
                         action_semantics='bounded_slew_home_delta_v2',
                         training_recipe='m6_repair_' + str(args.repair_variant) + '_v1')

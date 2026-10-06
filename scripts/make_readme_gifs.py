@@ -19,8 +19,8 @@ def main():
     for name in ('app_preview', 'mujoco_preview'):
         source = args.media_dir / f'{name}.mp4'
         destination = output / f'{name}.gif'
-        filters = ('[0:v]setpts=(PTS-STARTPTS)/5,fps=8,scale=720:-1:flags=lanczos,split[a][b];'
-                   '[a]palettegen=max_colors=80:stats_mode=diff[p];'
+        filters = ('[0:v]setpts=(PTS-STARTPTS)/5,fps=6,scale=640:-1:flags=lanczos,split[a][b];'
+                   '[a]palettegen=max_colors=64:stats_mode=diff[p];'
                    '[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle[v]')
         subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
                         '-threads', '4', '-i', str(source), '-filter_complex_threads', '2',
@@ -33,11 +33,11 @@ def main():
             raise ValueError(f'{destination.name} exceeds the 10 MiB README budget')
         if not 35 <= float(probe['format']['duration']) <= 37:
             raise ValueError('Unexpected preview duration')
-        if int(probe['streams'][0]['nb_read_frames']) < 280:
+        if int(probe['streams'][0]['nb_read_frames']) < 210:
             raise ValueError('Incomplete animated preview')
         records[name] = dict(source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                             gif_sha256=hashlib.sha256(destination.read_bytes()).hexdigest(),
-                            bytes=destination.stat().st_size, speed=5, fps=8,
+                            bytes=destination.stat().st_size, speed=5, fps=6,
                             full_source_timeline=True, probe=probe)
         print(f'{destination.name}: {destination.stat().st_size} bytes', flush=True)
     (ROOT / 'docs/gif_previews.json').write_text(json.dumps(records, indent=2) + '\n')

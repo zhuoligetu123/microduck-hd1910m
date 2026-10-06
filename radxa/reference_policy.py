@@ -1,4 +1,4 @@
-"""Luwu policy contract on local HD1910/BNO085 calibration; no hardware I/O.
+"""Reference policy contract on local HD1910/BNO085 calibration; no hardware I/O.
 
 Encoder zero is NOT policy HOME. Quaternion order is wxyz. Native body-frame
 IMU data bypasses mounting rotation; raw BNO085 data is rotated exactly once.
@@ -13,7 +13,7 @@ import numpy as np
 import onnxruntime as ort
 
 ROOT = Path(__file__).resolve().parent
-MODEL_DIR = ROOT / 'references/luwu_runtime_20261005'
+MODEL_DIR = ROOT / 'references/reference_runtime_20261005'
 INSTALLATION = ROOT / 'installation.json'
 ROLES = ('walk', 'getup', 'pick', 'roulade')
 JOINTS = ('left_hip_yaw', 'left_hip_roll', 'left_hip_pitch', 'left_knee',
@@ -94,7 +94,7 @@ class LocalCalibration:
         result = {}
         for servo_id, ticks in self.requested_ticks(positions, mouth).items():
             if saturate:
-                # Pinned Luwu scs_bus.h satPos; never wrap across the zero seam.
+                # Pinned Reference scs_bus.h satPos; never wrap across the zero seam.
                 ticks = float(np.clip(ticks, 0, 4095))
             elif not 0 <= ticks <= 4095:
                 raise ValueError(f'ID{servo_id}: target outside single-turn encoder domain: {ticks}')
@@ -143,12 +143,12 @@ class LocalCalibration:
                 rotate(conjugate(self.mount), gyro_body))
 
 
-class LuwuPolicy:
+class ReferencePolicy:
     def __init__(self, role, directory=MODEL_DIR):
         if role not in ROLES:
             raise ValueError(f'no published policy for {role}; available: {ROLES}')
         self.role = role
-        self.path = Path(directory) / f'xgoduck_{role}.onnx'
+        self.path = Path(directory) / f'hd1910_{role}.onnx'
         manifest = json.loads((Path(directory)/'manifest.json').read_text())
         self.sha256 = hashlib.sha256(self.path.read_bytes()).hexdigest()
         if self.sha256 != manifest['models'][role]['sha256']:
@@ -230,14 +230,14 @@ class BodyFeedbackFilter:
         return self.gyro.copy(), self.velocity.copy()
 
 
-class LuwuSuite:
+class ReferenceSuite:
     """Explicit task selection; episodic skills return to idle WALK.
 
     Get-up remains selected until the caller confirms actual supported recovery.
     No hidden fall-triggered auto-restart or hardware commands.
     """
     def __init__(self, directory=MODEL_DIR):
-        self.policies = {role: LuwuPolicy(role, directory) for role in ROLES}
+        self.policies = {role: ReferencePolicy(role, directory) for role in ROLES}
         self.select('walk', 0.)
 
     def select(self, role, now):
@@ -250,7 +250,7 @@ class LuwuSuite:
         self.policies[role].reset()
 
     def recovery_ready(self, gravity_body, now, dt=.02):
-        """Luwu get-up exit: tilt below 15 degrees continuously for one second."""
+        """Reference get-up exit: tilt below 15 degrees continuously for one second."""
         if self.role != 'getup':
             return False
         gravity = vector(gravity_body, 3)
