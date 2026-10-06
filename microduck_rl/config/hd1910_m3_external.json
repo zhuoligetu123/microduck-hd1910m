@@ -1,0 +1,14 @@
+{
+  "kt": 0.6253,
+  "R": 3.146,
+  "error_gain_ratio": 1.068817,
+  "armature": 0.001882,
+  "max_velocity": 20.0,
+  "q_offset": -0.045745,
+  "command_delay": 0.001849,
+  "friction_base": 0.005505,
+  "friction_viscous": 0.006319,
+  "load_friction_base": 0.242174,
+  "model": "m3",
+  "actuator": "hd1910"
+}

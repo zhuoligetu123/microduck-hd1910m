@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-06",
+  "hardware_tested_this_release": false,
+  "native_build": "passed",
+  "arm64_cross_build": "passed; Linux glibc >=2.35",
+  "rust_tests": {
+    "duck_control": 128,
+    "robotd": 145,
+    "robotd_integration": 7,
+    "robotd_params": 87,
+    "backend": 7,
+    "ignored_external_model_tests": 3
+  },
+  "python_contract_tests": 12,
+  "release_config_tests": 3,
+  "native_sim_protocol": {
+    "physical_hardware": false,
+    "physics": "MuJoCo BAM M6 with fixed base support",
+    "gait_qualified": false,
+    "enable_home_without_rl": true,
+    "stop_holds_enabled": true,
+    "skills": [
+      "recovery",
+      "roulade",
+      "ground_pick",
+      "stand",
+      "walk"
+    ],
+    "walk_command": [
+      0.0244,
+      0.0,
+      0.0488
+    ],
+    "mouth_target": 0.2617993877991494
+  },
+  "release_launcher": "passed, isolated simulation health online; no physical I/O",
+  "apk": {
+    "package": "com.microduck.control",
+    "version": "0.1.1",
+    "version_code": 2,
+    "signature": "APK v2 verified; internal debug-signed build",
+    "source_uploaded": false
+  },
+  "urdf": {
+    "sha256": "32d83c8da8a9887a9e6bc07499d2d0c00107e3e9a5d4263a7fb9c44626280775",
+    "visual_mesh_references": 70,
+    "all_resolve": true
+  },
+  "assets": {
+    "app_preview.mp4": {
+      "sha256": "9732a597cc0804089e4e4cfbcdf8afdedcee639b6410158c1042408e2ff11702",
+      "bytes": 30772253,
+      "video": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "30/1",
+            "nb_frames": "5400"
+          }
+        ],
+        "format": {
+          "duration": "180.000000"
+        }
+      }
+    },
+    "microduck-hd1910m-arm64.tar.gz": {
+      "sha256": "c6f839e3e73ee62fa8cacd330770bf464f3862244cac247a999f7d83740b9926",
+      "bytes": 9310884
+    },
+    "microduck.apk": {
+      "sha256": "f3ec46a96795f913a3d3b1db155d492b4278587793eff68dfff9fb1788b8c8a4",
+      "bytes": 8667946
+    },
+    "microduck_exploded.gif": {
+      "sha256": "f60b97aa39252ff6ca7fed8ee69a2e2c6f80231c805c586dea14033b2570cedd",
+      "bytes": 21798437
+    },
+    "mujoco_preview.mp4": {
+      "sha256": "cd8aef502dd99f73627ef6800374361aaab4886e6f3913c2f026c31cbcdd0478",
+      "bytes": 46039850,
+      "video": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "30/1",
+            "nb_frames": "5400"
+          }
+        ],
+        "format": {
+          "duration": "180.000000"
+        }
+      }
+    }
+  },
+  "limits": [
+    "No new physical robot test",
+    "No new long training run",
+    "Native protocol simulation uses fixed base support, not a gait qualification",
+    "Historical free-body video includes skill failures; see video_validation.json"
+  ]
+}

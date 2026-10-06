@@ -1,0 +1,31 @@
+{
+  "status": "user_inventory_confirmed_cad_component_masses_unknown",
+  "confirmed_components": {
+    "large_bearings": {"count": 10, "each_g": 3.7, "leg_count": 8, "head_roll_count": 2},
+    "small_bearings": {"count": 2, "each_g": 1.8, "location": "one per ankle"},
+    "head_board": {"type": "Radxa ZERO 3W bare board", "mass_g": 20, "location": "behind eyes above mouth", "replaces_pi_and_hat": true},
+    "back_battery": {"mass_g": 110, "installed": true}
+  },
+  "listed_component_total_g": 170.6,
+  "original_cad_components": {"large_bearings": 11, "small_bearings": 3, "head_boards": ["pcb__raspberry_pi_zero_2_w", "elec_rpi_robot_hat_pcb"], "battery_mesh": "np_f970"},
+  "cad_component_masses_kg": null,
+  "whole_robot_measured_mass_kg": null,
+  "nominal_mass_policy": "Keep CAD aggregate inertias plus existing 45g motor correction. Do not add the listed 170.6g a second time or guess component subtractions.",
+  "uncertainty_note": "Engineering sensitivity envelope, not measured bounds or an exact replacement model. Scale complete body mass and inertia together; COM bounds cover uncertain mounting positions.",
+  "body_mass_scale_ranges": {
+    "trunk_base": [0.8, 1.2],
+    "jaw_soft": [0.8, 1.2],
+    "yaw_roll_motion": [0.9, 1.1],
+    "neck_pitch": [0.9, 1.1],
+    "yaw2roll": [0.9, 1.1],
+    "hip_l": [0.9, 1.1],
+    "upper_leg_left": [0.9, 1.1],
+    "ankle_left": [0.9, 1.1],
+    "bearing_roll": [0.9, 1.1],
+    "hip_l_2": [0.9, 1.1],
+    "upper_leg_right": [0.9, 1.1],
+    "ankle_right": [0.9, 1.1]
+  },
+  "trunk_com_offset_m": 0.008,
+  "head_com_offset_m": 0.008
+}

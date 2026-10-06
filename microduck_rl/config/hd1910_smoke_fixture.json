@@ -1,0 +1,15 @@
+{
+  "model": "HD-1910-C001",
+  "mode": 4,
+  "status": "SYNTHETIC PIPELINE FIXTURE ONLY - NOT FOR HARDWARE",
+  "fit": {
+    "stiffness_nm_per_rad": 1.0,
+    "damping_nm_s_per_rad": 0.05,
+    "armature_kg_m2": 0.001,
+    "frictionloss_nm": 0.01,
+    "viscous_damping_nm_s_per_rad": 0.001,
+    "delay_steps": 2,
+    "physics_dt_s": 0.005,
+    "evidence": "Synthetic numerically stable 5ms pipeline fixture, not measured"
+  }
+}

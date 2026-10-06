@@ -1,0 +1,19 @@
+{
+  "joints": [
+    {"id": 1, "name": "right_ankle"},
+    {"id": 2, "name": "right_knee"},
+    {"id": 3, "name": "right_hip_pitch"},
+    {"id": 4, "name": "right_hip_roll"},
+    {"id": 5, "name": "right_hip_yaw"},
+    {"id": 6, "name": "left_ankle"},
+    {"id": 7, "name": "left_knee"},
+    {"id": 8, "name": "left_hip_pitch"},
+    {"id": 9, "name": "left_hip_roll"},
+    {"id": 10, "name": "left_hip_yaw"},
+    {"id": 11, "name": "head_pitch"},
+    {"id": 12, "name": "neck_pitch"},
+    {"id": 13, "name": "head_roll"},
+    {"id": 14, "name": "head_yaw"},
+    {"id": 15, "name": "mouth"}
+  ]
+}

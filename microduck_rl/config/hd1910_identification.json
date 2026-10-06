@@ -1,0 +1,15 @@
+{
+  "model": "HD-1910-C001",
+  "mode": 4,
+  "status": "physical gains and drivetrain identification pending; not a trained model",
+  "fit": {
+    "stiffness_nm_per_rad": null,
+    "damping_nm_s_per_rad": null,
+    "armature_kg_m2": null,
+    "frictionloss_nm": null,
+    "viscous_damping_nm_s_per_rad": null,
+    "delay_steps": null,
+    "physics_dt_s": 0.005,
+    "evidence": ""
+  }
+}

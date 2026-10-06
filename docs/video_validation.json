@@ -1,0 +1,203 @@
+{
+  "hardware": false,
+  "videos": {
+    "app_preview": {
+      "width": 1920,
+      "height": 1080,
+      "duration_s": 180.0,
+      "frames": 5400,
+      "fps": "30/1",
+      "bytes": 30772253,
+      "decode_errors": 0,
+      "distinct_sample_frames": 7
+    },
+    "mujoco_preview": {
+      "width": 1920,
+      "height": 1080,
+      "duration_s": 180.0,
+      "frames": 5400,
+      "fps": "30/1",
+      "bytes": 46039850,
+      "decode_errors": 0,
+      "distinct_sample_frames": 7
+    }
+  },
+  "app_commands": {
+    "enable": 4,
+    "skill": 12,
+    "move": 1053,
+    "stop": 7,
+    "head": 9,
+    "mouth": 4
+  },
+  "rejected_commands": [],
+  "browser_errors": [],
+  "app_frames": 3220,
+  "physics_frames": 9000,
+  "control_hz_median": 49.99954285417969,
+  "sim_feedback_position_present": true,
+  "command_and_policy_trace": "capture.json, app_states.jsonl, sim_states.jsonl",
+  "walk": {
+    "directions": {
+      "forward": {
+        "passed": true,
+        "mean_body_vx_m_s": 0.24238737842557712,
+        "mean_yaw_rate_rad_s": -0.28677403513893346,
+        "forward_distance_m": 2.419026036686992,
+        "yaw_change_deg": -163.98080003620646,
+        "max_tilt_deg": 9.225245297084863,
+        "command_requested": [
+          0.29999999999999916,
+          0.0,
+          0.0
+        ],
+        "command_applied": [
+          0.29999999999999916,
+          0.0,
+          0.0
+        ],
+        "policy_command": [
+          0.30000001192092896,
+          0.0,
+          0.0
+        ]
+      },
+      "backward": {
+        "passed": true,
+        "mean_body_vx_m_s": -0.10561684926516718,
+        "mean_yaw_rate_rad_s": 0.05783505358003709,
+        "forward_distance_m": -0.9484393064014254,
+        "yaw_change_deg": 29.757066212888017,
+        "max_tilt_deg": 9.672295433117442,
+        "command_requested": [
+          -0.2999999999999994,
+          0.0,
+          0.0
+        ],
+        "command_applied": [
+          -0.2999999999999994,
+          0.0,
+          0.0
+        ],
+        "policy_command": [
+          -0.30000001192092896,
+          0.0,
+          0.0
+        ]
+      },
+      "left": {
+        "passed": true,
+        "mean_body_vx_m_s": 0.010614278984418869,
+        "mean_yaw_rate_rad_s": 0.9538705692341282,
+        "forward_distance_m": 0.07408766731128161,
+        "yaw_change_deg": 381.47624957581655,
+        "max_tilt_deg": 4.253204082539253,
+        "command_requested": [
+          0.0,
+          0.0,
+          0.7999999999999982
+        ],
+        "command_applied": [
+          -2.0407453982054344e-22,
+          0.0,
+          0.7999999999999982
+        ],
+        "policy_command": [
+          -2.0407453781486956e-22,
+          0.0,
+          0.800000011920929
+        ]
+      },
+      "right": {
+        "passed": true,
+        "mean_body_vx_m_s": 0.019392038859261357,
+        "mean_yaw_rate_rad_s": -0.6868213283578017,
+        "forward_distance_m": 0.13535643123771351,
+        "yaw_change_deg": -274.6767044935476,
+        "max_tilt_deg": 2.5557545916239204,
+        "command_requested": [
+          0.0,
+          0.0,
+          -0.7999999999999982
+        ],
+        "command_applied": [
+          -1.458078885673399e-80,
+          0.0,
+          -0.7999999999999982
+        ],
+        "policy_command": [
+          0.0,
+          0.0,
+          -0.800000011920929
+        ]
+      }
+    },
+    "max_tilt_deg": 10.654597052866347,
+    "fell": false
+  },
+  "head_mouth": {
+    "max_tilt_deg": 3.059998273946096,
+    "mouth_is_visual_only": true
+  },
+  "pick": {
+    "phase_completed": true,
+    "stable_return": false,
+    "physical_object_grasp_tested": false
+  },
+  "recovery": {
+    "initial_condition": "left side, seed42",
+    "stable_upright": false
+  },
+  "roulade": {
+    "pitch_rotation_deg": 593.585981480191,
+    "head_contact": true,
+    "head_top_contact": true,
+    "stable_before_followup_recovery": false,
+    "success": false
+  },
+  "reset_events": [
+    {
+      "wall": 1791180953.781,
+      "event": "scene_setup",
+      "op": "release",
+      "pose": "home"
+    },
+    {
+      "wall": 1791181037.779,
+      "event": "scene_setup",
+      "op": "reset",
+      "pose": "home"
+    },
+    {
+      "wall": 1791181040.064,
+      "event": "scene_setup",
+      "op": "release",
+      "pose": "home"
+    },
+    {
+      "wall": 1791181060.773,
+      "event": "scene_setup",
+      "op": "reset",
+      "pose": "left"
+    },
+    {
+      "wall": 1791181063.781,
+      "event": "scene_setup",
+      "op": "release",
+      "pose": "home"
+    },
+    {
+      "wall": 1791181094.79,
+      "event": "scene_setup",
+      "op": "reset",
+      "pose": "home"
+    },
+    {
+      "wall": 1791181097.077,
+      "event": "scene_setup",
+      "op": "release",
+      "pose": "home"
+    }
+  ],
+  "timing_note": "Browser end-aligned; MuJoCo rendered from original wall-time states, no new inference."
+}

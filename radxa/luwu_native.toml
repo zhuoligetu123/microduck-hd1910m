@@ -1,0 +1,41 @@
+[bus]
+port = "feetech:/home/robot/workspace/huggingface/radxa/luwu_native.json"
+[control]
+hz = 50
+[policy]
+luwu_native = true
+supported_m6 = false
+enabled = true
+walk = "/home/robot/workspace/huggingface/radxa/references/luwu_runtime_20261005/xgoduck_walk.onnx"
+stand = "none"
+sitstand = "none"
+ground_pick = "/home/robot/workspace/huggingface/radxa/references/luwu_runtime_20261005/xgoduck_pick.onnx"
+kick_left = "none"
+kick_right = "none"
+roulade = "/home/robot/workspace/huggingface/radxa/references/luwu_runtime_20261005/xgoduck_roulade.onnx"
+action_scale = 1.0
+standing_action_scale = 1.0
+standing_gain_ratio = 1.0
+gain = 200
+head_lowpass = 1.0
+legs_lowpass = 1.0
+voltage_adapt = false
+ground_pick_period = 4.0
+ground_pick_action_scale = 1.0
+ground_pick_gain_ratio = 1.0
+[[policy.skill]]
+name = "recovery"
+path = "/home/robot/workspace/huggingface/radxa/references/luwu_runtime_20261005/xgoduck_getup.onnx"
+duration = 13.0
+[[policy.skill]]
+name = "roulade"
+path = "/home/robot/workspace/huggingface/radxa/references/luwu_runtime_20261005/xgoduck_roulade.onnx"
+duration = 1.9
+[audio]
+enabled = false
+greet = false
+[safety]
+battery_empty_shutdown = false
+limp_fall = false
+deadman_ms = 300
+gain_limp = 200

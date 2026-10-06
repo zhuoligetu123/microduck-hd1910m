@@ -1,0 +1,579 @@
+{
+  "schema": 1,
+  "source": "/home/robot/workspace/yannuo/huggingface/radxa/reports/home_upright_20261004_121919/capture.jsonl",
+  "source_sha256": "8a38d133ba430c11cc5e679170917283cc19c0ec72e62d3dce444518780b0ffe",
+  "frames": 1016,
+  "unique_snapshots": 1006,
+  "seconds": 30.02084941800001,
+  "joints": [
+    {
+      "direction": -1,
+      "id": 10,
+      "name": "left_hip_yaw",
+      "zero_ticks": 2048,
+      "target_rad": 0.0,
+      "measured_rad": -0.0046019423636569235,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": -0.0046019423636569235,
+      "current_abs_a": {
+        "mean": 0.09018588469184889,
+        "min": 0.0,
+        "max": 0.1625,
+        "p05": 0.0455,
+        "p50": 0.091,
+        "p95": 0.143
+      },
+      "current_signed_a": {
+        "mean": 0.09018588469184889,
+        "min": 0.0,
+        "max": 0.1625,
+        "p05": 0.0455,
+        "p50": 0.091,
+        "p95": 0.143
+      },
+      "voltage_v": {
+        "mean": 6.70258449304175,
+        "min": 6.3,
+        "max": 6.8,
+        "p05": 6.7,
+        "p50": 6.7,
+        "p95": 6.7
+      }
+    },
+    {
+      "direction": -1,
+      "id": 9,
+      "name": "left_hip_roll",
+      "zero_ticks": 2048,
+      "target_rad": -0.0873,
+      "measured_rad": -0.08436894333371027,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.002931056666289733,
+      "current_abs_a": {
+        "mean": 0.04414960238568589,
+        "min": 0.026,
+        "max": 0.1105,
+        "p05": 0.0325,
+        "p50": 0.0455,
+        "p95": 0.052
+      },
+      "current_signed_a": {
+        "mean": -0.04414960238568589,
+        "min": -0.1105,
+        "max": -0.026,
+        "p05": -0.052,
+        "p50": -0.0455,
+        "p95": -0.0325
+      },
+      "voltage_v": {
+        "mean": 6.68568588469185,
+        "min": 6.2,
+        "max": 6.7,
+        "p05": 6.6,
+        "p50": 6.7,
+        "p95": 6.7
+      }
+    },
+    {
+      "direction": -1,
+      "id": 8,
+      "name": "left_hip_pitch",
+      "zero_ticks": 2048,
+      "target_rad": -0.4579,
+      "measured_rad": -0.461728217153578,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": -0.0038282171535780063,
+      "current_abs_a": {
+        "mean": 0.10485288270377734,
+        "min": 0.0,
+        "max": 0.13649999999999998,
+        "p05": 0.08449999999999999,
+        "p50": 0.104,
+        "p95": 0.1235
+      },
+      "current_signed_a": {
+        "mean": 0.10485288270377734,
+        "min": 0.0,
+        "max": 0.13649999999999998,
+        "p05": 0.08449999999999999,
+        "p50": 0.104,
+        "p95": 0.1235
+      },
+      "voltage_v": {
+        "mean": 6.598310139165008,
+        "min": 6.1,
+        "max": 6.7,
+        "p05": 6.6,
+        "p50": 6.6,
+        "p95": 6.6
+      }
+    },
+    {
+      "direction": -1,
+      "id": 7,
+      "name": "left_knee",
+      "zero_ticks": 2048,
+      "target_rad": -0.0049,
+      "measured_rad": 0.03681553890925539,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.04171553890925539,
+      "current_abs_a": {
+        "mean": 0.3500437375745527,
+        "min": 0.325,
+        "max": 0.4355,
+        "p05": 0.33799999999999997,
+        "p50": 0.351,
+        "p95": 0.364
+      },
+      "current_signed_a": {
+        "mean": -0.3500437375745527,
+        "min": -0.4355,
+        "max": -0.325,
+        "p05": -0.364,
+        "p50": -0.351,
+        "p95": -0.33799999999999997
+      },
+      "voltage_v": {
+        "mean": 6.603677932405565,
+        "min": 6.1,
+        "max": 6.7,
+        "p05": 6.6,
+        "p50": 6.6,
+        "p95": 6.7
+      }
+    },
+    {
+      "direction": -1,
+      "id": 6,
+      "name": "left_ankle",
+      "zero_ticks": 2048,
+      "target_rad": 0.453,
+      "measured_rad": 0.4479223900626072,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": -0.005077609937392813,
+      "current_abs_a": {
+        "mean": 0.154081013916501,
+        "min": 0.065,
+        "max": 0.182,
+        "p05": 0.13649999999999998,
+        "p50": 0.156,
+        "p95": 0.16899999999999998
+      },
+      "current_signed_a": {
+        "mean": 0.154081013916501,
+        "min": 0.065,
+        "max": 0.182,
+        "p05": 0.13649999999999998,
+        "p50": 0.156,
+        "p95": 0.16899999999999998
+      },
+      "voltage_v": {
+        "mean": 6.64155069582505,
+        "min": 6.2,
+        "max": 6.7,
+        "p05": 6.6,
+        "p50": 6.6,
+        "p95": 6.7
+      }
+    },
+    {
+      "direction": 1,
+      "id": 12,
+      "name": "neck_pitch",
+      "zero_ticks": 2048,
+      "target_rad": 0.3491,
+      "measured_rad": 0.34974761963792617,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.0006476196379261445,
+      "current_abs_a": {
+        "mean": 0.0012470178926441353,
+        "min": 0.0,
+        "max": 0.0065,
+        "p05": 0.0,
+        "p50": 0.0,
+        "p95": 0.0065
+      },
+      "current_signed_a": {
+        "mean": 0.0012340954274353876,
+        "min": -0.0065,
+        "max": 0.0065,
+        "p05": 0.0,
+        "p50": 0.0,
+        "p95": 0.0065
+      },
+      "voltage_v": {
+        "mean": 7.260238568588468,
+        "min": 7.2,
+        "max": 7.3,
+        "p05": 7.2,
+        "p50": 7.3,
+        "p95": 7.3
+      }
+    },
+    {
+      "direction": 1,
+      "id": 11,
+      "name": "head_pitch",
+      "zero_ticks": 2048,
+      "target_rad": 0.3491,
+      "measured_rad": 0.37889325460775336,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.02979325460775334,
+      "current_abs_a": {
+        "mean": 0.29719731610337974,
+        "min": 0.27949999999999997,
+        "max": 0.3185,
+        "p05": 0.286,
+        "p50": 0.299,
+        "p95": 0.3055
+      },
+      "current_signed_a": {
+        "mean": 0.29719731610337974,
+        "min": 0.27949999999999997,
+        "max": 0.3185,
+        "p05": 0.286,
+        "p50": 0.299,
+        "p95": 0.3055
+      },
+      "voltage_v": {
+        "mean": 6.904870775347914,
+        "min": 6.9,
+        "max": 7.0,
+        "p05": 6.9,
+        "p50": 6.9,
+        "p95": 6.9
+      }
+    },
+    {
+      "direction": -1,
+      "id": 14,
+      "name": "head_yaw",
+      "zero_ticks": 2048,
+      "target_rad": 0.0,
+      "measured_rad": 0.0015339807878856412,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.0015339807878856412,
+      "current_abs_a": {
+        "mean": 0.002254970178926441,
+        "min": 0.0,
+        "max": 0.013,
+        "p05": 0.0,
+        "p50": 0.0,
+        "p95": 0.0065
+      },
+      "current_signed_a": {
+        "mean": -0.002099900596421471,
+        "min": -0.013,
+        "max": 0.0065,
+        "p05": -0.0065,
+        "p50": 0.0,
+        "p95": 0.0
+      },
+      "voltage_v": {
+        "mean": 6.77365805168986,
+        "min": 6.7,
+        "max": 6.8,
+        "p05": 6.7,
+        "p50": 6.8,
+        "p95": 6.8
+      }
+    },
+    {
+      "direction": -1,
+      "id": 13,
+      "name": "head_roll",
+      "zero_ticks": 2048,
+      "target_rad": 0.0,
+      "measured_rad": 0.010737865515199488,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.010737865515199488,
+      "current_abs_a": {
+        "mean": 0.07869135188866799,
+        "min": 0.065,
+        "max": 0.09749999999999999,
+        "p05": 0.0715,
+        "p50": 0.078,
+        "p95": 0.08449999999999999
+      },
+      "current_signed_a": {
+        "mean": -0.07869135188866799,
+        "min": -0.09749999999999999,
+        "max": -0.065,
+        "p05": -0.08449999999999999,
+        "p50": -0.078,
+        "p95": -0.0715
+      },
+      "voltage_v": {
+        "mean": 6.900894632206762,
+        "min": 6.9,
+        "max": 7.0,
+        "p05": 6.9,
+        "p50": 6.9,
+        "p95": 6.9
+      }
+    },
+    {
+      "direction": -1,
+      "id": 15,
+      "name": "mouth",
+      "zero_ticks": 2048,
+      "target_rad": 0.0,
+      "measured_rad": 0.0015339807878856412,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.0015339807878856412,
+      "current_abs_a": {
+        "mean": 0.0027395626242544733,
+        "min": 0.0,
+        "max": 0.026,
+        "p05": 0.0,
+        "p50": 0.0,
+        "p95": 0.0065
+      },
+      "current_signed_a": {
+        "mean": 0.0024552683896620275,
+        "min": -0.026,
+        "max": 0.013,
+        "p05": 0.0,
+        "p50": 0.0,
+        "p95": 0.0065
+      },
+      "voltage_v": {
+        "mean": 6.702783300198808,
+        "min": 6.5,
+        "max": 6.8,
+        "p05": 6.7,
+        "p50": 6.7,
+        "p95": 6.7
+      }
+    },
+    {
+      "direction": -1,
+      "id": 5,
+      "name": "right_hip_yaw",
+      "zero_ticks": 2048,
+      "target_rad": 0.0,
+      "measured_rad": 0.0030679615757712823,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.0030679615757712823,
+      "current_abs_a": {
+        "mean": 0.05812524850894633,
+        "min": 0.0325,
+        "max": 0.143,
+        "p05": 0.039,
+        "p50": 0.058499999999999996,
+        "p95": 0.0715
+      },
+      "current_signed_a": {
+        "mean": -0.05812524850894633,
+        "min": -0.143,
+        "max": -0.0325,
+        "p05": -0.0715,
+        "p50": -0.058499999999999996,
+        "p95": -0.039
+      },
+      "voltage_v": {
+        "mean": 6.681113320079524,
+        "min": 6.6,
+        "max": 6.7,
+        "p05": 6.6,
+        "p50": 6.7,
+        "p95": 6.7
+      }
+    },
+    {
+      "direction": -1,
+      "id": 4,
+      "name": "right_hip_roll",
+      "zero_ticks": 2048,
+      "target_rad": 0.0873,
+      "measured_rad": 0.08130098175793898,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": -0.005999018242061019,
+      "current_abs_a": {
+        "mean": 0.09096123260437375,
+        "min": 0.0195,
+        "max": 0.1235,
+        "p05": 0.078,
+        "p50": 0.091,
+        "p95": 0.104
+      },
+      "current_signed_a": {
+        "mean": 0.09096123260437375,
+        "min": 0.0195,
+        "max": 0.1235,
+        "p05": 0.078,
+        "p50": 0.091,
+        "p95": 0.104
+      },
+      "voltage_v": {
+        "mean": 6.662226640159045,
+        "min": 6.2,
+        "max": 6.7,
+        "p05": 6.6,
+        "p50": 6.7,
+        "p95": 6.7
+      }
+    },
+    {
+      "direction": -1,
+      "id": 3,
+      "name": "right_hip_pitch",
+      "zero_ticks": 2048,
+      "target_rad": 0.4579,
+      "measured_rad": 0.461728217153578,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.0038282171535780063,
+      "current_abs_a": {
+        "mean": 0.052161530815109346,
+        "min": 0.026,
+        "max": 0.1495,
+        "p05": 0.039,
+        "p50": 0.052,
+        "p95": 0.065
+      },
+      "current_signed_a": {
+        "mean": -0.052161530815109346,
+        "min": -0.1495,
+        "max": -0.026,
+        "p05": -0.065,
+        "p50": -0.052,
+        "p95": -0.039
+      },
+      "voltage_v": {
+        "mean": 6.597017892644134,
+        "min": 6.4,
+        "max": 6.6,
+        "p05": 6.6,
+        "p50": 6.6,
+        "p95": 6.6
+      }
+    },
+    {
+      "direction": -1,
+      "id": 2,
+      "name": "right_knee",
+      "zero_ticks": 2048,
+      "target_rad": 0.0049,
+      "measured_rad": -0.035281558121369745,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": -0.04018155812136975,
+      "current_abs_a": {
+        "mean": 0.41449453280318094,
+        "min": 0.33149999999999996,
+        "max": 0.4355,
+        "p05": 0.40299999999999997,
+        "p50": 0.416,
+        "p95": 0.4225
+      },
+      "current_signed_a": {
+        "mean": 0.41449453280318094,
+        "min": 0.33149999999999996,
+        "max": 0.4355,
+        "p05": 0.40299999999999997,
+        "p50": 0.416,
+        "p95": 0.4225
+      },
+      "voltage_v": {
+        "mean": 6.652882703777336,
+        "min": 6.2,
+        "max": 6.7,
+        "p05": 6.6,
+        "p50": 6.7,
+        "p95": 6.7
+      }
+    },
+    {
+      "direction": -1,
+      "id": 1,
+      "name": "right_ankle",
+      "zero_ticks": 2048,
+      "target_rad": -0.453,
+      "measured_rad": -0.4387185053352934,
+      "measured_span_rad": 0.0,
+      "measured_minus_target_rad": 0.014281494664706629,
+      "current_abs_a": {
+        "mean": 0.08317544731610338,
+        "min": 0.052,
+        "max": 0.1755,
+        "p05": 0.065,
+        "p50": 0.08449999999999999,
+        "p95": 0.09749999999999999
+      },
+      "current_signed_a": {
+        "mean": -0.08317544731610338,
+        "min": -0.1755,
+        "max": -0.052,
+        "p05": -0.09749999999999999,
+        "p50": -0.08449999999999999,
+        "p95": -0.065
+      },
+      "voltage_v": {
+        "mean": 6.60238568588469,
+        "min": 6.1,
+        "max": 6.7,
+        "p05": 6.6,
+        "p50": 6.6,
+        "p95": 6.6
+      }
+    }
+  ],
+  "policy_joint_names": [
+    "left_hip_yaw",
+    "left_hip_roll",
+    "left_hip_pitch",
+    "left_knee",
+    "left_ankle",
+    "neck_pitch",
+    "head_pitch",
+    "head_yaw",
+    "head_roll",
+    "right_hip_yaw",
+    "right_hip_roll",
+    "right_hip_pitch",
+    "right_knee",
+    "right_ankle"
+  ],
+  "tilt_deg": {
+    "mean": 3.532646467118186,
+    "min": 3.4844096686364328,
+    "max": 3.574113814868992,
+    "p05": 3.511270117791098,
+    "p50": 3.532413708729559,
+    "p95": 3.562632570226676
+  },
+  "frame_median_voltage_v": {
+    "mean": 6.68051689860835,
+    "min": 6.6,
+    "max": 6.7,
+    "p05": 6.6,
+    "p50": 6.7,
+    "p95": 6.7
+  },
+  "applied_encoder_offset_rad": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "applied_bam_parameter_changes": {},
+  "external_support_measured": false,
+  "current_to_torque_identified": false,
+  "role": "static validation and initialization reference, not a new policy or mechanical zero",
+  "limits": [
+    "No measured external support/contact forces",
+    "Voltage telemetry is not independently calibrated",
+    "One loaded pose cannot identify zero, PD, friction, inertia or delay"
+  ],
+  "baseline_policy_sha256": "fc8b790539e22b175dce9ae41146bd253ca90d00934f64b50d9e0397f8ae2f7f"
+}

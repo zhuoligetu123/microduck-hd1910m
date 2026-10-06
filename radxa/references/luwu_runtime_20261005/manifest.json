@@ -1,0 +1,25 @@
+{
+  "repository": "https://github.com/LuwuDynamics/xgoduck_runtime_arduino",
+  "commit": "8cdbbd84710d856581982c9eaf0d5e2970666232",
+  "source_directory": "python",
+  "weights_modified": false,
+  "simulation_only": true,
+  "control_period_s": 0.02,
+  "observation_dim": 61,
+  "action_dim": 14,
+  "home_source": "Per-model ONNX default_joint_pos, not runtime hardcoded HOME_DEG",
+  "previous_action": "raw neural output before EMA",
+  "local_encoder_resolution": 4096,
+  "firmware_reference_encoder_resolution": 4095,
+  "simulation_output": "Explicit scs_bus.h satPos saturation to 0..4095; calibration and native driver unchanged",
+  "imu_adapter": "BNO085 fused orientation with existing local mount; body gyro EMA 0.5 and velocity EMA 0.4 at 100Hz; no second QMI8658 gravity estimator",
+  "body_command": "six zeros, matching published Arduino Python runtime",
+  "models": {
+    "walk": {"sha256": "5727b909d5ea1a0f9ff63bf4cea9707339dea6a522374c7a120da633605b923f", "ema_old_weight": 0.45, "command": "vx, vy, wz + 4 head offsets"},
+    "getup": {"sha256": "c414f2bd84b0a79b89f0ba6997135eb45e4ecd9df9271ea989c237864027b2a3", "ema_old_weight": 0.45, "command": "zero twist/head/body"},
+    "pick": {"sha256": "f34e990dda785e9a8c53890bdcd0f7f1d457592691fd3703f3776b48fb2d14b8", "ema_old_weight": 0.45, "duration_s": 4.0, "command": "cos(2*pi*t/4), sin(2*pi*t/4), 0; mouth +30deg until phase 0.4, then 0"},
+    "roulade": {"sha256": "8adb1e6bc3f5eef751ce4edbf940f6d5a25fdec3ec4a798e1d9ca135c8248e97", "ema_old_weight": 0.15, "duration_s": 1.9, "command": "zero twist/head/body"}
+  },
+  "unavailable_published_weights": ["sitstand", "kick_left", "kick_right"],
+  "licensing": "No repository LICENSE found at pinned commit; local evaluation copy, redistribution rights not established."
+}

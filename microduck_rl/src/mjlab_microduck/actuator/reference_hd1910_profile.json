@@ -1,0 +1,103 @@
+{
+  "manufacturer": "FEETECH",
+  "model": "HD-1910-C001",
+  "source": "HD-1910-C001 serial servo datasheet, A/0, 2026-09-07",
+  "status": "datasheet_based_provisional_NOT_calibrated",
+  "hardware": {
+    "motor_count": 15,
+    "policy_action_count": 14,
+    "mass_kg": 0.021,
+    "mass_tolerance_kg": 0.002,
+    "size_m": [
+      0.034,
+      0.02,
+      0.023
+    ],
+    "gear_ratio": 320,
+    "backlash_max_deg": 0.5,
+    "encoder_counts_per_rev": 4096,
+    "encoder_neutral_raw": 2048,
+    "kt_output_nominal_nm_per_a": 0.73549875,
+    "working_voltage_v": [
+      4.0,
+      8.4
+    ],
+    "default_mode": 4,
+    "default_mode_name": "pure position PD",
+    "default_baud": 1000000,
+    "serial_format": "TTL half-duplex, 8N1",
+    "default_id": 1,
+    "id_range": [
+      0,
+      253
+    ],
+    "pin_order": [
+      "Signal",
+      "Vcc",
+      "GND"
+    ],
+    "max_position_update_hz": 1000
+  },
+  "performance": [
+    {
+      "voltage_v": 4.8,
+      "stall_nm": 0.8825985,
+      "rated_nm": 0.2157463,
+      "no_load_rpm": 73,
+      "stall_a": 1.2,
+      "rated_a": 0.5
+    },
+    {
+      "voltage_v": 6.0,
+      "stall_nm": 1.176798,
+      "rated_nm": 0.2941995,
+      "no_load_rpm": 92,
+      "stall_a": 1.6,
+      "rated_a": 0.69
+    },
+    {
+      "voltage_v": 7.4,
+      "stall_nm": 1.4709975,
+      "rated_nm": 0.36284605,
+      "no_load_rpm": 113,
+      "stall_a": 2.0,
+      "rated_a": 0.9
+    }
+  ],
+  "simulation": {
+    "nominal_voltage_v": 7.4,
+    "voltage_range_v": [
+      6.5,
+      8.4
+    ],
+    "voltage_range_note": "2S direct supply assumption. 6.5 V lower sampling bound retained from the upstream experiment, NOT a measured battery cutoff.",
+    "above_7_4v": "cap performance at 7.4 V values; no extrapolation to 8.4 V",
+    "torque_limit_policy": "rated torque hard cap, conservative; transient overload/thermal model unknown",
+    "stiffness_nm_per_rad": 0.55,
+    "damping_nm_s_per_rad": 0.0,
+    "gains_note": "Legacy XML P=0.55 and D=0 retained as UNCALIBRATED reference, not HD1910 firmware units or measured gains.",
+    "armature_kg_m2": 0.0018077432831600838,
+    "coulomb_nm": 0.004771183165566,
+    "viscous_nm_s_per_rad": 0.005359668274599504,
+    "mechanics_note": "Uncalibrated XL330 BAM reference inertia/base friction; advanced XL330 load/Stribeck friction is not copied.",
+    "delay_physics_steps": [
+      3,
+      6
+    ],
+    "delay_note": "Old reference, 15-30 ms at 5 ms physics timestep; HD1910 latency not measured.",
+    "old_servo_nominal_mass_kg": 0.018,
+    "mass_correction_note": "Assume old CAD used XL330 nominal 18 g. Add 3 g at each of 15 old motor mesh centers; update aggregate COM/inertia by parallel-axis theorem. Internal motor mass distribution remains unknown.",
+    "backlash_note": "Backlash variants use +/-0.25 degree (datasheet total upper bound 0.5, not measured actual play). Output-side encoder feedback preserves the existing model assumption; HD1910 encoder placement needs confirmation."
+  },
+  "unknown": [
+    "HD1910-specific register addresses, encodings and firmware revision",
+    "Mode 4 P/D defaults, unit conversion and PWM/current/torque output law",
+    "Mode 4 current limit behavior and transient/continuous thermal envelope",
+    "Rotor/reflected inertia, Coulomb/Stribeck/load-dependent friction",
+    "End-to-end command/readback latency and velocity filtering",
+    "Per-joint installation zero, direction, actual COM/inertia",
+    "8.4 V performance, battery sag and measured low-voltage cutoff",
+    "Encoder position relative to modeled gearbox play; output-side feedback is a retained assumption"
+  ]
+}
+

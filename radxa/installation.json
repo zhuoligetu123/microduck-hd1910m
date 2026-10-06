@@ -1,0 +1,25 @@
+{
+  "mapping_confirmed": true,
+  "calibration_verified": false,
+  "purpose": "Read-only wiring/mapping example. Use the device's verified calibration for motion.",
+  "imu_mount_wxyz": [0.5, -0.5, 0.5, -0.5],
+  "imu_mount_basis": "Body XYZ = [sensor Z, -sensor X, -sensor Y]: board X right, Y down, Z forward. Removed previous posture-derived trim; no automatic level reset. Gravity and gyro use the same transform; yaw is not calibrated.",
+  "imu_pose_verified": false,
+  "joints": [
+    {"name": "left_hip_yaw", "id": 10, "zero_ticks": 2048, "direction": -1},
+    {"name": "left_hip_roll", "id": 9, "zero_ticks": 2048, "direction": -1},
+    {"name": "left_hip_pitch", "id": 8, "zero_ticks": 2048, "direction": -1},
+    {"name": "left_knee", "id": 7, "zero_ticks": 2048, "direction": -1},
+    {"name": "left_ankle", "id": 6, "zero_ticks": 2048, "direction": -1},
+    {"name": "neck_pitch", "id": 12, "zero_ticks": 2048, "direction": 1},
+    {"name": "head_pitch", "id": 11, "zero_ticks": 2048, "direction": 1},
+    {"name": "head_yaw", "id": 14, "zero_ticks": 2048, "direction": -1},
+    {"name": "head_roll", "id": 13, "zero_ticks": 2048, "direction": -1},
+    {"name": "mouth", "id": 15, "zero_ticks": 2048, "direction": -1},
+    {"name": "right_hip_yaw", "id": 5, "zero_ticks": 2048, "direction": -1},
+    {"name": "right_hip_roll", "id": 4, "zero_ticks": 2048, "direction": -1},
+    {"name": "right_hip_pitch", "id": 3, "zero_ticks": 2048, "direction": -1},
+    {"name": "right_knee", "id": 2, "zero_ticks": 2048, "direction": -1},
+    {"name": "right_ankle", "id": 1, "zero_ticks": 2048, "direction": -1}
+  ]
+}
