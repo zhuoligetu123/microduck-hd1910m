@@ -29,7 +29,7 @@ Radxa ZERO 3W + 飞特 HD1910M ×15 + BNO08x。包含当前 Luwu 四模型适配
 | 11 / 12 | 上颈 `head_pitch` / 下颈 `neck_pitch` |
 | 13 / 14 / 15 | 侧头 `head_roll` / 转头 `head_yaw` / 嘴 |
 
-以关节名称映射模型输出，不能把模型数组下标当作电机 ID。[展开动画下载](../../releases/latest/download/microduck_exploded.gif)。
+以关节名称映射模型输出，不能把模型数组下标当作电机 ID。[展开动画下载](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/microduck_exploded.gif)。
 
 ## 3. URDF 零位标定
 
@@ -49,12 +49,12 @@ App“使能”→平滑进入 HOME→静止保持；随后再选择行走/任�
 
 ## 5. 演示与 APK
 
-[![App 演示](docs/images/app_final.png)](../../releases/latest/download/app_preview.mp4)
-[![MuJoCo 演示](docs/images/mujoco_00210.jpg)](../../releases/latest/download/mujoco_preview.mp4)
+[![App 演示](docs/images/app_final.png)](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/app_preview.mp4)
+[![MuJoCo 演示](docs/images/mujoco_00210.jpg)](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/mujoco_preview.mp4)
 
-[下载 APK](../../releases/latest/download/microduck.apk) · [App 视频](../../releases/latest/download/app_preview.mp4) · [MuJoCo 视频](../../releases/latest/download/mujoco_preview.mp4)
+[下载 APK](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/microduck.apk) · [App 视频](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/app_preview.mp4) · [MuJoCo 视频](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/mujoco_preview.mp4)
 
-APK 为当前 `com.microduck.control 0.1.1` 内部测试签名包；[ARM64 运行包](../../releases/latest/download/microduck-hd1910m-arm64.tar.gz)包含编译后的底层、后端、模型与部署脚本。
+APK 为当前 `com.microduck.control 0.1.1` 内部测试签名包；[ARM64 运行包](https://github.com/zhuoligetu123/microduck-hd1910m/releases/latest/download/microduck-hd1910m-arm64.tar.gz)包含编译后的底层、后端、模型与部署脚本。
 
 两个视频均为 **1920×1080、30fps、180秒**。这是仿真展示，不是实机验收：方向控制已验证；仍有直行偏航，拾取回稳、起身和翻滚落地未全部成功。嘴部在当前 MuJoCo 中为显示动画，非接触动力学。[视频验证记录](docs/video_validation.json)。
 

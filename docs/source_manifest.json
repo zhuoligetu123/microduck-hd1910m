@@ -1,6 +1,6 @@
 {
   ".gitignore": "fd2b331f513dca0c897f4e8a8826b5f3595092828d08bf425cc15c53cc1e3b99",
-  "README.md": "34d3cf2ea5049271f472295e481dc0c5c6b54140924349fcd63c0ef08e9a3d4c",
+  "README.md": "95914a29daf4aa18f6dc87b476120611aa40f46b404018c16e0a27f8533b66ff",
   "THIRD_PARTY.md": "d34f31bff3c5401af8e5c72516fe26217c5c8fec8cb6e3f677c2fce899e67a9f",
   "docs/images/01_overview.png": "b6ae90adaa0a7967f7f03b61278626a0574a29a0e4381c1cd9e054aaabc9f5e9",
   "docs/images/04_photo_imu_power.png": "65c0892fc28bbbba65123860c075e1b231d6897f784de938f927b1f00df97764",
@@ -10,7 +10,7 @@
   "docs/images/app_final.png": "ea78987f70831f3d1811f0d8765a0fa35c593136d39f1cc040ad18dcd1f78c2e",
   "docs/images/gif_final_frame.png": "fa0ac246315f059fd8f178500202e2a5723c2ca32066f7d900206c2208c2275e",
   "docs/images/mujoco_00210.jpg": "10b4ac48d14ab14bc5b0edcc77e5eae1cc61aae37e9a899835f3f30070629a9b",
-  "docs/release_validation.json": "4fbc6d34be6cd184c49faea28cf0105170b26e4ad3cdd8c62a67f9da4d7e8dcb",
+  "docs/release_validation.json": "55e9eee572efb0f10b31f0cfb408d7cf92868b79ab77f9add254c400ee3cca67",
   "docs/training.md": "2c2091d154b831599c19796fc05bd14ddb14da0d9a1bef5bc205cdb99991049f",
   "docs/video_validation.json": "91dcc35cdf88c65342bebcc4b9a9518e7173c89716083786e80b4fde887d22ac",
   "microduck/.cargo/config.toml": "1640af64aa50e1365f7660f35ba3872cb5c0a1f1bc3ead2f1d146c29b1392b44",
